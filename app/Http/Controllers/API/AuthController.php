@@ -76,38 +76,38 @@ class AuthController extends Controller
     }
   }
 
-  // public function login(Request $request)
-  // {
-  //   try {
-  //     $credentials = $request->only(['email', 'password']);
+  public function login(Request $request)
+  {
+    try {
+      $credentials = $request->only(['email', 'password']);
 
-  //     if (!Auth::attempt($credentials)) {
-  //       return response()->json([
-  //         "success" => false,
-  //         "message" => "Unauthorized"
-  //       ], 401);
-  //     }
+      if (!Auth::attempt($credentials)) {
+        return response()->json([
+          "success" => false,
+          "message" => "Unauthorized"
+        ], 401);
+      }
 
-  //     $user = User::where('email', $request->email)->firstOrFail();
+      $user = User::where('email', $request->email)->firstOrFail();
 
-  //     if ($user->is_active === 'N') {
-  //       return response()->json(['message' => 'Akun Anda belum diaktifkan oleh admin.'], 401);
-  //     }
+      if ($user->is_active === 'N') {
+        return response()->json(['message' => 'Akun Anda belum diaktifkan oleh admin.'], 401);
+      }
 
-  //     $user->is_login = 'Y';
-  //     $user->save();
+      $user->is_login = 'Y';
+      $user->save();
 
-  //     $token = $user->createToken('auth_token')->plainTextToken;
+      $token = $user->createToken('auth_token')->plainTextToken;
 
-  //     return response()->json([
-  //       'success' => true,
-  //       'message' => 'Login berhasil dilakukan',
-  //       'access_token' => $token
-  //     ]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json([
+        'success' => true,
+        'message' => 'Login berhasil dilakukan',
+        'access_token' => $token
+      ]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function logout(Request $request)
   // {
