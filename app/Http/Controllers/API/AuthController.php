@@ -128,15 +128,15 @@ class AuthController extends Controller
     }
   }
 
-  // public function getProfile()
-  // {
-  //   try {
-  //     $user = Auth::user()->load('role');
-  //     return response()->json(['success' => true, 'message' => 'Profile berhasil didapatkan', 'data' => $user]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+  public function getProfile()
+  {
+    try {
+      $user = Auth::user()->load('role');
+      return response()->json(['success' => true, 'message' => 'Profile berhasil didapatkan', 'data' => $user]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function updateProfile(Request $request)
   // {
