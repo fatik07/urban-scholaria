@@ -5,6 +5,7 @@ use App\Http\Controllers\API\LicensingController;
 use App\Http\Controllers\API\RoleController;
 use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\SuratJenisController;
+use App\Http\Controllers\API\SuratSyaratController;
 use App\Http\Controllers\API\VerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,5 +41,15 @@ Route::controller(SuratJenisController::class)->group(function () {
     Route::get("surat-jenis/{id}", "show");
     Route::patch("surat-jenis/{id}", "update");
     Route::delete("surat-jenis/{id}", "destroy");
+  });
+});
+
+Route::controller(SuratSyaratController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::get("surat-syarat", "index");
+    Route::post("surat-syarat", "create");
+    Route::get("surat-syarat/{id}", "show");
+    Route::patch("surat-syarat/{id}", "update");
+    Route::delete("surat-syarat/{id}", "destroy");
   });
 });
