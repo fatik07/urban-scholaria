@@ -109,24 +109,24 @@ class AuthController extends Controller
     }
   }
 
-  // public function logout(Request $request)
-  // {
-  //   try {
-  //     $user = $request->user();
+  public function logout(Request $request)
+  {
+    try {
+      $user = $request->user();
 
-  //     Auth::user()->tokens()->delete();
+      Auth::user()->tokens()->delete();
 
-  //     $user->is_login = 'N';
-  //     $user->save();
+      $user->is_login = 'N';
+      $user->save();
 
-  //     return response()->json([
-  //       "success" => true,
-  //       "message" => "Logout berhasil dilakukan"
-  //     ]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json([
+        "success" => true,
+        "message" => "Logout berhasil dilakukan"
+      ]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function getProfile()
   // {
