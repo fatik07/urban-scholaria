@@ -138,55 +138,55 @@ class AuthController extends Controller
     }
   }
 
-  // public function updateProfile(Request $request)
-  // {
-  //   try {
-  //     $user = Auth::user();
+  public function updateProfile(Request $request)
+  {
+    try {
+      $user = Auth::user();
 
-  //     $validator = Validator::make($request->all(), [
-  //       "role_id" => "nullable|exists:role,id",
-  //       'username' => 'string|max:255|nullable',
-  //       'email' => 'string|nullable|email|max:255|unique:user,email,' . $user->id,
-  //       'password' => 'nullable|string|min:8',
-  //       'nama_lengkap' => 'string|max:255|nullable',
-  //       'jenis_identitas' => 'nullable|in:KTP,Paspor',
-  //       'nomor_identitas' => 'nullable|string|max:100|unique:user,nomor_identitas,' . $user->id,
-  //       'jenis_kelamin' => 'nullable|in:Laki-Laki,Perempuan',
-  //       'tempat_lahir' => 'nullable|string|max:100',
-  //       'tanggal_lahir' => 'nullable|date',
-  //       'provinsi' => 'nullable|string|max:100',
-  //       'kabupaten_kota' => 'nullable|string|max:100',
-  //       'kecamatan' => 'nullable|string|max:100',
-  //       'kelurahan' => 'nullable|string|max:100',
-  //       'alamat' => 'nullable|string',
-  //       'no_telp' => 'nullable|string|max:100|unique:user,no_telp,' . $user->id,
-  //       'pekerjaan' => 'nullable|string|max:100',
-  //       'is_login' => 'nullable|in:Y,N',
-  //       'is_active' => 'nullable|in:Y,N'
-  //     ]);
+      $validator = Validator::make($request->all(), [
+        "role_id" => "nullable|exists:role,id",
+        'username' => 'string|max:255|nullable',
+        'email' => 'string|nullable|email|max:255|unique:user,email,' . $user->id,
+        'password' => 'nullable|string|min:8',
+        'nama_lengkap' => 'string|max:255|nullable',
+        'jenis_identitas' => 'nullable|in:KTP,Paspor',
+        'nomor_identitas' => 'nullable|string|max:100|unique:user,nomor_identitas,' . $user->id,
+        'jenis_kelamin' => 'nullable|in:Laki-Laki,Perempuan',
+        'tempat_lahir' => 'nullable|string|max:100',
+        'tanggal_lahir' => 'nullable|date',
+        'provinsi' => 'nullable|string|max:100',
+        'kabupaten_kota' => 'nullable|string|max:100',
+        'kecamatan' => 'nullable|string|max:100',
+        'kelurahan' => 'nullable|string|max:100',
+        'alamat' => 'nullable|string',
+        'no_telp' => 'nullable|string|max:100|unique:user,no_telp,' . $user->id,
+        'pekerjaan' => 'nullable|string|max:100',
+        'is_login' => 'nullable|in:Y,N',
+        'is_active' => 'nullable|in:Y,N'
+      ]);
 
-  //     if ($validator->fails()) {
-  //       return response()->json(['errors' => $validator->errors()], 400);
-  //     }
+      if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+      }
 
-  //     $dataToUpdate = $request->only([
-  //       "role_id", "username", "email", "password", "nama_lengkap", "jenis_identitas",
-  //       "nomor_identitas", "jenis_kelamin", "tempat_lahir", "tanggal_lahir",
-  //       "provinsi", "kabupaten_kota", "kecamatan", "kelurahan", "alamat",
-  //       "no_telp", "pekerjaan", "is_login", "is_active"
-  //     ]);
+      $dataToUpdate = $request->only([
+        "role_id", "username", "email", "password", "nama_lengkap", "jenis_identitas",
+        "nomor_identitas", "jenis_kelamin", "tempat_lahir", "tanggal_lahir",
+        "provinsi", "kabupaten_kota", "kecamatan", "kelurahan", "alamat",
+        "no_telp", "pekerjaan", "is_login", "is_active"
+      ]);
 
-  //     if (!empty($dataToUpdate['password'])) {
-  //       $dataToUpdate['password'] = Hash::make($dataToUpdate['password']);
-  //     }
+      if (!empty($dataToUpdate['password'])) {
+        $dataToUpdate['password'] = Hash::make($dataToUpdate['password']);
+      }
 
-  //     $user->update($dataToUpdate);
+      $user->update($dataToUpdate);
 
-  //     return response()->json(['success' => true, 'message' => 'Profile berhasil diupdate', 'data' => $user]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['success' => true, 'message' => 'Profile berhasil diupdate', 'data' => $user]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function activateAccount($userId)
   // {
