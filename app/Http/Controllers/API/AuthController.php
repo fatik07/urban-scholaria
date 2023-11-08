@@ -188,29 +188,29 @@ class AuthController extends Controller
     }
   }
 
-  // public function activateAccount($userId)
-  // {
-  //   $user = User::find($userId);
+  public function activateAccount($userId)
+  {
+    $user = User::find($userId);
 
-  //   if (!$user) {
-  //     return response()->json(['message' => 'User tidak ditemukan'], 404);
-  //   }
+    if (!$user) {
+      return response()->json(['message' => 'User tidak ditemukan'], 404);
+    }
 
-  //   $user->is_active = 'Y';
-  //   $user->save();
+    $user->is_active = 'Y';
+    $user->save();
 
-  //   $data['email'] = $user->email;
-  //   $data['title'] = 'Aktivasi Akun';
-  //   $data['body'] = 'Akun anda berhasil diaktivasi, silahkan login kembali !';
+    $data['email'] = $user->email;
+    $data['title'] = 'Aktivasi Akun';
+    $data['body'] = 'Akun anda berhasil diaktivasi, silahkan login kembali !';
 
-  //   try {
-  //     Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
-  //       $message->to($data['email'])->subject($data['title']);
-  //     });
+    try {
+      Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
+        $message->to($data['email'])->subject($data['title']);
+      });
 
-  //     return response()->json(['success' => true, 'message' => 'Selamat, segera cek email anda !']);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['success' => true, 'message' => 'Selamat, segera cek email anda !']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 }
