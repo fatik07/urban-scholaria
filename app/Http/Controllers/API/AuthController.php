@@ -190,20 +190,24 @@ class AuthController extends Controller
 
   public function activateAccount($userId)
   {
-    $user = User::find($userId);
-
-    if (!$user) {
-      return response()->json(['message' => 'User tidak ditemukan'], 404);
+    if (auth()->user()->role->nama !== 'Admin Utama') {
+      return response()->json(['message' => 'Akses ditolak'], 403);
     }
 
-    $user->is_active = 'Y';
-    $user->save();
-
-    $data['email'] = $user->email;
-    $data['title'] = 'Aktivasi Akun';
-    $data['body'] = 'Akun anda berhasil diaktivasi, silahkan login kembali !';
-
     try {
+      $user = User::find($userId);
+
+      if (!$user) {
+        return response()->json(['message' => 'User tidak ditemukan'], 404);
+      }
+
+      $user->is_active = 'Y';
+      $user->save();
+
+      $data['email'] = $user->email;
+      $data['title'] = 'Aktivasi Akun';
+      $data['body'] = 'Akun anda berhasil diaktivasi, silahkan login kembali !';
+
       Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
         $message->to($data['email'])->subject($data['title']);
       });

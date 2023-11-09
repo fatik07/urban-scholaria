@@ -1,12 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\LicensingController;
-use App\Http\Controllers\API\RoleController;
-use App\Http\Controllers\API\SubmissionController;
 use App\Http\Controllers\API\SuratJenisController;
 use App\Http\Controllers\API\SuratSyaratController;
-use App\Http\Controllers\API\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
