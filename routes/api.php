@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratJenisController;
 use App\Http\Controllers\API\SuratSyaratController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,13 @@ Route::controller(AuthController::class)->group(function () {
     Route::post("aktivasi-akun/{userId}", "activateAccount");
 
     Route::post("logout", "logout");
+  });
+});
+
+Route::controller(SuratController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::get("surat", "index");
+    Route::post("surat", "create");
   });
 });
 
