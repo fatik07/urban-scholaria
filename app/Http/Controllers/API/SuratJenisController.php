@@ -110,27 +110,31 @@ class SuratJenisController extends Controller
 
       if ($request->hasFile('gambar_alur_permohonan')) {
         if ($suratJenis->gambar_alur_permohonan) {
-          Storage::delete($suratJenis->gambar_alur_permohonan);
+          Storage::delete("public/documents/surat-jenis/gambar-alur-permohonan/" . basename($suratJenis->gambar_alur_permohonan));
         }
 
-        $gambarAlurPermohonanBaru = $request->file('gambar_alur_permohonan')->storeAs("public/documents/surat-jenis/gambar-alur-permohonan", $request->file('gambar_alur_permohonan')->getClientOriginalName());
+        $gambarAlurPermohonan = $request->file('gambar_alur_permohonan');
+        $path = $gambarAlurPermohonan->storeAs("public/documents/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
 
-        $suratJenis->gambar_alur_permohonan = $gambarAlurPermohonanBaru;
+        $suratJenis->gambar_alur_permohonan = $path;
       }
 
       if ($request->hasFile('gambar_service_level_aggreement')) {
         if ($suratJenis->gambar_service_level_aggreement) {
-          Storage::delete($suratJenis->gambar_service_level_aggreement);
+          Storage::delete("public/documents/surat-jenis/gambar-service-level-aggreement/" . basename($suratJenis->gambar_service_level_aggreement));
         }
 
-        $gambarServiceLevelAggreementBaru = $request->file('gambar_service_level_aggreement')->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $request->file('gambar_service_level_aggreement')->getClientOriginalName());
+        $gambarServiceLevelAggreement = $request->file('gambar_service_level_aggreement');
+        $path = $gambarServiceLevelAggreement->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
 
-        $suratJenis->gambar_service_level_aggreement = $gambarServiceLevelAggreementBaru;
+        $suratJenis->gambar_service_level_aggreement = $path;
       }
 
-      $dataToUpdate = $request->only(['nama', 'gambar_alur_permohonan', 'gambar_service_level_aggreement']);
+      if ($request->filled('nama')) {
+        $suratJenis->nama = $request->nama;
+      }
 
-      $suratJenis->update($dataToUpdate);
+      $suratJenis->save();
 
       return response()->json(['success' => true, 'message' => 'Surat jenis berhasil diupdate', 'data' => $suratJenis]);
     } catch (\Exception $e) {
