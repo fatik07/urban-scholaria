@@ -12,4 +12,9 @@ class SuratJenis extends Model
   public $table = 'surat_jenis';
 
   protected $fillable = ['nama', 'gambar_alur_permohonan', 'gambar_service_level_aggreement'];
+
+  public function suratSyarats()
+  {
+    return $this->hasMany(SuratSyarat::class, 'surat_jenis_id', 'id');
+  }
 }

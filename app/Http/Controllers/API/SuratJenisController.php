@@ -72,7 +72,7 @@ class SuratJenisController extends Controller
   public function show($id)
   {
     try {
-      $suratJenis = SuratJenis::find($id);
+      $suratJenis = SuratJenis::with('suratSyarats')->find($id);
 
       if ($suratJenis) {
         return response()->json(['success' => true, 'message' => 'Surat jenis berhasil didapatkan', 'data' => $suratJenis]);
