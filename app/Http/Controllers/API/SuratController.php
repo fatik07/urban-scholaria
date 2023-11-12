@@ -325,30 +325,30 @@ class SuratController extends Controller
   }
 
   // // role operator
-  // public function terimaVerifikasiOperator($suratId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Operator') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function terimaVerifikasiOperator($suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Operator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $surat = Surat::findOrFail($suratId);
+      $surat = Surat::findOrFail($suratId);
 
-  //     $surat->status = 'Verifikasi Verifikator';
-  //     $surat->save();
+      $surat->status = 'Verifikasi Verifikator';
+      $surat->save();
 
-  //     Notifikasi::create([
-  //       'user_id' => $surat->user_id,
-  //       'judul' => 'Surat berhasil di validasi oleh operator',
-  //       'deskripsi' => 'Segera untuk cek suratnya',
-  //       'is_seen' => 'N'
-  //     ]);
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Surat berhasil di validasi oleh operator',
+        'deskripsi' => 'Segera untuk cek suratnya',
+        'is_seen' => 'N'
+      ]);
 
-  //     return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi']);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function tolakVerifikasiOperator(Request $request, $suratId)
   // {
