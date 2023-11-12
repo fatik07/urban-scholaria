@@ -71,13 +71,3 @@ Route::controller(SuratSyaratController::class)->group(function () {
     // Route::delete("surat-syarat/{id}", "destroy");
   });
 });
-
-// Route::controller(SuratDokumenController::class)->group(function () {
-//   Route::middleware("auth:sanctum")->group(function () {
-//     Route::get("surat-dokumen", "index");
-//     Route::post("surat-dokumen", "create");
-//     Route::get("surat-dokumen/{id}", "show");
-//     Route::patch("surat-dokumen/{id}", "update");
-//     Route::delete("surat-dokumen/{id}", "destroy");
-//   });
-// });

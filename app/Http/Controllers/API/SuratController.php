@@ -26,16 +26,28 @@ class SuratController extends Controller
       if (auth()->user()->role->nama !== 'Pemohon') {
         $status = $request->query('status');
 
-        $query = Surat::with('suratDokumen');
+        if ($status) {
+          $query = Surat::with('suratDokumen');
+
+          if ($status) {
+            $query->where('status', $status);
+          }
+
+          $surat = $query->get();
+
+          return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan dengan status verifikasi operator', 'data' => $surat]);
+        } else {
+          $surat = Surat::with('suratDokumen')->get();
+
+          return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
+        }
+      } else {
+        $status = $request->query('status');
 
         if ($status) {
-          $query->where('status', $status);
+          return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        $surat = $query->get();
-
-        return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan', 'data' => $surat]);
-      } else {
         $surat = Surat::with('suratDokumen')->get();
 
         return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
@@ -117,7 +129,6 @@ class SuratController extends Controller
 
       if (!$surat->is_dikembalikan === 'Y') {
         $validator = Validator::make($request->all(), [
-          "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
           "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
           "alamat_lokasi" => "nullable|string|max:255",
           "longitude" => "nullable|string|max:255",
@@ -132,13 +143,11 @@ class SuratController extends Controller
         }
 
         $kategori = optional($request->input('kategori'))->get();
-        $status = 'Verfikasi Operator';
         $is_dikembalikan = 'N';
         $alasan_dikembalikan = null;
 
-        $dataToUpdate = $request->only(['status', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
+        $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
         $dataToUpdate['kategori'] = $kategori;
-        $dataToUpdate['status'] = $status;
         $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
         $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
 
@@ -288,6 +297,8 @@ class SuratController extends Controller
       }
 
       $suratDokumen->update(['dokumen_upload' => $path]);
+
+      $suratDokumen->surat->update(['is_dikembalikan' => 'N', 'alasan_dikembalikan' => null]);
 
       return response()->json(['message' => 'Surat dokumen berhasil diupdate.', 'data' => $suratDokumen]);
     } catch (\Exception $e) {

@@ -12,4 +12,9 @@ class SuratDokumen extends Model
   public $table = 'surat_dokumen';
 
   protected $fillable = ['surat_id', 'surat_syarat_id', 'dokumen_upload'];
+
+  public function surat()
+  {
+    return $this->belongsTo(Surat::class, 'surat_id', 'id');
+  }
 }
