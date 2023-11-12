@@ -46,9 +46,13 @@ Route::controller(SuratController::class)->group(function () {
 
     Route::patch("surat/{suratId}/surat-selesai", "suratSelesai");
 
-    // // validasi oleh operator
-    Route::patch("surat/{suratId}/terima-verifikasi", "terimaVerifikasiOperator");
-    Route::patch("surat/{suratId}/tolak-verifikasi", "tolakVerifikasiOperator");
+    // validasi oleh operator
+    Route::patch("surat/{suratId}/terima-operator", "terimaVerifikasiOperator");
+    Route::patch("surat/{suratId}/tolak-operator", "tolakVerifikasiOperator");
+
+    // validasi oleh verifikator
+    Route::patch("surat/{suratId}/terima-verifikator", "terimaVerifikasiVerifikator");
+    Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
   });
 });
 

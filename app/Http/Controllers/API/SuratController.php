@@ -355,7 +355,7 @@ class SuratController extends Controller
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi']);
+      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi oleh operator']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -382,7 +382,60 @@ class SuratController extends Controller
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi']);
+      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi oleh operator']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  // // role verifikator
+  public function terimaVerifikasiVerifikator($suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Verifikator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $surat = Surat::findOrFail($suratId);
+
+      $surat->status = 'Penjadwalan Survey';
+      $surat->save();
+
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Surat berhasil di validasi oleh verifikator',
+        'deskripsi' => 'Segera untuk cek suratnya',
+        'is_seen' => 'N'
+      ]);
+
+      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi oleh verifikator']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function tolakVerifikasiVerifikator(Request $request, $suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Verifikator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $surat = Surat::findOrFail($suratId);
+
+      $surat->status = 'Pengisian Dokumen';
+      $surat->is_dikembalikan = 'Y';
+      $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
+      $surat->save();
+
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Surat gagal di validasi oleh verifikator',
+        'deskripsi' => 'Segera untuk cek suratnya, untuk melihat alasannya',
+        'is_seen' => 'N'
+      ]);
+
+      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi oleh verifikator']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
