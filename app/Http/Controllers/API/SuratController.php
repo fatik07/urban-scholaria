@@ -350,30 +350,30 @@ class SuratController extends Controller
     }
   }
 
-  // public function tolakVerifikasiOperator(Request $request, $suratId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Operator') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function tolakVerifikasiOperator(Request $request, $suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Operator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $surat = Surat::findOrFail($suratId);
+      $surat = Surat::findOrFail($suratId);
 
-  //     $surat->status = 'Pengisian Dokumen';
-  //     $surat->is_dikembalikan = 'Y';
-  //     $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
-  //     $surat->save();
+      $surat->status = 'Pengisian Dokumen';
+      $surat->is_dikembalikan = 'Y';
+      $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
+      $surat->save();
 
-  //     Notifikasi::create([
-  //       'user_id' => $surat->user_id,
-  //       'judul' => 'Surat gagal di validasi oleh operator',
-  //       'deskripsi' => 'Segera untuk cek suratnya, untuk melihat alasannya',
-  //       'is_seen' => 'N'
-  //     ]);
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Surat gagal di validasi oleh operator',
+        'deskripsi' => 'Segera untuk cek suratnya, untuk melihat alasannya',
+        'is_seen' => 'N'
+      ]);
 
-  //     return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi']);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 }
