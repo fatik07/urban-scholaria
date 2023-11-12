@@ -106,52 +106,52 @@ class SuratController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  // public function update(Request $request, $id)
-  // {
-  //   try {
-  //     $surat = Surat::find($id);
+  public function update(Request $request, $id)
+  {
+    try {
+      $surat = Surat::find($id);
 
-  //     if (!$surat) {
-  //       return response()->json(['message' => 'Surat tidak ditemukan'], 404);
-  //     }
+      if (!$surat) {
+        return response()->json(['message' => 'Surat tidak ditemukan'], 404);
+      }
 
-  //     if (!$surat->is_dikembalikan === 'Y') {
-  //       $validator = Validator::make($request->all(), [
-  //         "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
-  //         "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
-  //         "alamat_lokasi" => "nullable|string|max:255",
-  //         "longitude" => "nullable|string|max:255",
-  //         "latitude" => "nullable|string|max:255",
-  //         "is_dikembalikan" => "nullable|in:Y,N",
-  //         "alasan_dikembalikan" => "nullable|string|max:255",
-  //         'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
-  //       ]);
+      if (!$surat->is_dikembalikan === 'Y') {
+        $validator = Validator::make($request->all(), [
+          "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
+          "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
+          "alamat_lokasi" => "nullable|string|max:255",
+          "longitude" => "nullable|string|max:255",
+          "latitude" => "nullable|string|max:255",
+          "is_dikembalikan" => "nullable|in:Y,N",
+          "alasan_dikembalikan" => "nullable|string|max:255",
+          'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
+        ]);
 
-  //       if ($validator->fails()) {
-  //         return response()->json(['errors' => $validator->errors()], 400);
-  //       }
+        if ($validator->fails()) {
+          return response()->json(['errors' => $validator->errors()], 400);
+        }
 
-  //       $kategori = optional($request->input('kategori'))->get();
-  //       $status = 'Verfikasi Operator';
-  //       $is_dikembalikan = 'N';
-  //       $alasan_dikembalikan = null;
+        $kategori = optional($request->input('kategori'))->get();
+        $status = 'Verfikasi Operator';
+        $is_dikembalikan = 'N';
+        $alasan_dikembalikan = null;
 
-  //       $dataToUpdate = $request->only(['status', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
-  //       $dataToUpdate['kategori'] = $kategori;
-  //       $dataToUpdate['status'] = $status;
-  //       $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
-  //       $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
+        $dataToUpdate = $request->only(['status', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
+        $dataToUpdate['kategori'] = $kategori;
+        $dataToUpdate['status'] = $status;
+        $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
+        $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
 
-  //       $surat->update($dataToUpdate);
+        $surat->update($dataToUpdate);
 
-  //       return response()->json(['success' => true, 'message' => 'Surat berhasil diupdate', 'data' => $surat]);
-  //     } else {
-  //       return response()->json(['success' => false, 'message' => 'Tidak bisa update surat, karena is_dikembalikan masih false']);
-  //     }
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+        return response()->json(['success' => true, 'message' => 'Surat berhasil diupdate', 'data' => $surat]);
+      } else {
+        return response()->json(['success' => false, 'message' => 'Tidak bisa update surat, karena is_dikembalikan masih false']);
+      }
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   /**
    * Remove the specified resource from storage.
@@ -247,53 +247,53 @@ class SuratController extends Controller
     }
   }
 
-  // public function updateDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Pemohon') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function updateDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Pemohon') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $validator = Validator::make($request->all(), [
-  //       'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
-  //     ]);
+      $validator = Validator::make($request->all(), [
+        'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
+      ]);
 
-  //     if ($validator->fails()) {
-  //       return response()->json(['errors' => $validator->errors()], 400);
-  //     }
+      if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+      }
 
-  //     $surat = Surat::find($suratId);
-  //     $suratJenis = SuratJenis::find($suratJenisId);
-  //     $suratSyarat = SuratSyarat::find($suratSyaratId);
+      $surat = Surat::find($suratId);
+      $suratJenis = SuratJenis::find($suratJenisId);
+      $suratSyarat = SuratSyarat::find($suratSyaratId);
 
-  //     if (!$surat || !$suratJenis || !$suratSyarat) {
-  //       return response()->json(['message' => 'Surat, surat jenis, atau surat syarat tidak ditemukan'], 404);
-  //     }
+      if (!$surat || !$suratJenis || !$suratSyarat) {
+        return response()->json(['message' => 'Surat, surat jenis, atau surat syarat tidak ditemukan'], 404);
+      }
 
-  //     $suratDokumen = SuratDokumen::where([
-  //       'surat_id' => $suratId,
-  //       'surat_syarat_id' => $suratSyaratId,
-  //     ])->first();
+      $suratDokumen = SuratDokumen::where([
+        'surat_id' => $suratId,
+        'surat_syarat_id' => $suratSyaratId,
+      ])->first();
 
-  //     if ($request->hasFile('dokumen_upload')) {
-  //       if ($suratDokumen->dokumen_upload) {
-  //         // Storage::delete($suratDokumen->dokumen_upload);
-  //         Storage::delete("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}/" . basename($suratDokumen->dokumen_upload));
-  //       }
+      if ($request->hasFile('dokumen_upload')) {
+        if ($suratDokumen->dokumen_upload) {
+          // Storage::delete($suratDokumen->dokumen_upload);
+          Storage::delete("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}/" . basename($suratDokumen->dokumen_upload));
+        }
 
-  //       $dokumenUpload = $request->file('dokumen_upload');
-  //       $path = $dokumenUpload->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $dokumenUpload->getClientOriginalName());
-  //     } else {
-  //       $path = $suratDokumen->dokumen_upload;
-  //     }
+        $dokumenUpload = $request->file('dokumen_upload');
+        $path = $dokumenUpload->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $dokumenUpload->getClientOriginalName());
+      } else {
+        $path = $suratDokumen->dokumen_upload;
+      }
 
-  //     $suratDokumen->update(['dokumen_upload' => $path]);
+      $suratDokumen->update(['dokumen_upload' => $path]);
 
-  //     return response()->json(['message' => 'Surat dokumen berhasil diupdate.', 'data' => $suratDokumen]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['message' => 'Surat dokumen berhasil diupdate.', 'data' => $suratDokumen]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   public function suratSelesai($suratId)
   {

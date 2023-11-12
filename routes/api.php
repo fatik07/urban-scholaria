@@ -36,13 +36,13 @@ Route::controller(SuratController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
     Route::get("surat", "index"); // bisa menggunakan param khusus status
     Route::post("surat", "create");
-    // Route::patch("surat/{id}", "update"); // jika ditolak validasinya
+    Route::patch("surat/{id}", "update"); // jika ditolak validasinya
 
     Route::get("surat/{userId}", "getSuratByUserId");
     Route::get("surat/{suratJenisId}/syarat", "getSyaratBySuratJenis");
 
     Route::post("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "uploadDokumenBySuratSyaratId");
-    // Route::patch("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "updateDokumenBySuratSyaratId");
+    Route::patch("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "updateDokumenBySuratSyaratId");
 
     Route::patch("surat/{suratId}/surat-selesai", "suratSelesai");
 
