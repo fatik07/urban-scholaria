@@ -39,7 +39,7 @@ Route::controller(SuratController::class)->group(function () {
     // Route::patch("surat/{id}", "update"); // jika ditolak validasinya
 
     Route::get("surat/{userId}", "getSuratByUserId");
-    // Route::get("surat/{suratJenisId}/syarat", "getSyaratBySuratJenis");
+    Route::get("surat/{suratJenisId}/syarat", "getSyaratBySuratJenis");
 
     // Route::post("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "uploadDokumenBySuratSyaratId");
     // Route::patch("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "updateDokumenBySuratSyaratId");

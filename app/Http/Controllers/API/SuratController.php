@@ -193,20 +193,20 @@ class SuratController extends Controller
     }
   }
 
-  // public function getSyaratBySuratJenis($suratJenisId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Pemohon') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function getSyaratBySuratJenis($suratJenisId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Pemohon') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $syarat = SuratSyarat::where('surat_jenis_id', $suratJenisId)->get();
+      $syarat = SuratSyarat::where('surat_jenis_id', $suratJenisId)->get();
 
-  //     return response()->json(['success' => true, 'data' => $syarat]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['success' => true, 'data' => $syarat]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function uploadDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
   // {
