@@ -208,44 +208,44 @@ class SuratController extends Controller
     }
   }
 
-  // public function uploadDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Pemohon') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function uploadDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Pemohon') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $validator = Validator::make($request->all(), [
-  //       'surat_id' => 'nullable|exists:surat,id',
-  //       'surat_syarat_id' => 'nullable|exists:surat_syarat,id',
-  //       'dokumen_upload' => 'required|mimes:pdf,doc,docx',
-  //     ]);
+      $validator = Validator::make($request->all(), [
+        'surat_id' => 'nullable|exists:surat,id',
+        'surat_syarat_id' => 'nullable|exists:surat_syarat,id',
+        'dokumen_upload' => 'required|mimes:pdf,doc,docx',
+      ]);
 
-  //     if ($validator->fails()) {
-  //       return response()->json(['errors' => $validator->errors()], 400);
-  //     }
+      if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+      }
 
-  //     $surat = Surat::find($suratId);
-  //     $suratJenis = SuratJenis::find($suratJenisId);
-  //     $suratSyarat = SuratSyarat::find($suratSyaratId);
+      $surat = Surat::find($suratId);
+      $suratJenis = SuratJenis::find($suratJenisId);
+      $suratSyarat = SuratSyarat::find($suratSyaratId);
 
-  //     if (!$surat) {
-  //       return response()->json(['message' => 'Surat tidak ditemukan'], 404);
-  //     }
+      if (!$surat) {
+        return response()->json(['message' => 'Surat tidak ditemukan'], 404);
+      }
 
-  //     $dokumenPath = $request->file('dokumen_upload')->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $request->file('dokumen_upload')->getClientOriginalName());
+      $dokumenPath = $request->file('dokumen_upload')->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $request->file('dokumen_upload')->getClientOriginalName());
 
-  //     $suratDokumen = SuratDokumen::create([
-  //       'surat_id' => $suratId,
-  //       'surat_syarat_id' => $suratSyaratId,
-  //       'dokumen_upload' => $dokumenPath,
-  //     ]);
+      $suratDokumen = SuratDokumen::create([
+        'surat_id' => $suratId,
+        'surat_syarat_id' => $suratSyaratId,
+        'dokumen_upload' => $dokumenPath,
+      ]);
 
-  //     return response()->json(['message' => 'Surat dokumen berhasil diunggah', 'data' => $suratDokumen]);
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+      return response()->json(['message' => 'Surat dokumen berhasil diunggah', 'data' => $suratDokumen]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // public function updateDokumenBySuratSyaratId(Request $request, $suratId, $suratJenisId, $suratSyaratId)
   // {
