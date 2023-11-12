@@ -11,5 +11,10 @@ class Surat extends Model
 
   public $table = 'surat';
 
-  protected $fillable = ['user_id', 'status', 'is_ulasan', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'jadwal_survey', 'nomor_penerbitan', 'alasan_ditolak'];
+  protected $fillable = ['user_id', 'status', 'is_ulasan', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'jadwal_survey', 'nomor_penerbitan', 'is_dikembalikan', 'alasan_dikembalikan'];
+
+  public function suratDokumen()
+  {
+    return $this->hasMany(SuratDokumen::class, 'surat_id', 'id');
+  }
 }
