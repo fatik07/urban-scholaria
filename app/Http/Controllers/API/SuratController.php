@@ -295,34 +295,34 @@ class SuratController extends Controller
   //   }
   // }
 
-  // public function suratSelesai($suratId)
-  // {
-  //   try {
-  //     if (auth()->user()->role->nama !== 'Pemohon') {
-  //       return response()->json(['message' => 'Akses ditolak'], 403);
-  //     }
+  public function suratSelesai($suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Pemohon') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
 
-  //     $surat = Surat::findOrFail($suratId);
+      $surat = Surat::findOrFail($suratId);
 
-  //     if ($surat->status === 'Pengisian Dokumen') {
-  //       $surat->status = 'Verifikasi Operator';
-  //       $surat->save();
+      if ($surat->status === 'Pengisian Dokumen') {
+        $surat->status = 'Verifikasi Operator';
+        $surat->save();
 
-  //       Notifikasi::create([
-  //         'user_id' => Auth::user()->id,
-  //         'judul' => 'Permohonan surat telah dibuat',
-  //         'deskripsi' => 'Segera untuk diverifikasi sebelum tanggal verifikasi habis',
-  //         'is_seen' => 'N'
-  //       ]);
+        Notifikasi::create([
+          'user_id' => Auth::user()->id,
+          'judul' => 'Permohonan surat telah dibuat',
+          'deskripsi' => 'Segera untuk diverifikasi sebelum tanggal verifikasi habis',
+          'is_seen' => 'N'
+        ]);
 
-  //       return response()->json(['success' => true, 'message' => 'Surat berhasil diselesaikan']);
-  //     } else {
-  //       return response()->json(['success' => false, 'message' => 'Surat sudah selesai atau tidak ditemukan']);
-  //     }
-  //   } catch (\Exception $e) {
-  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
-  //   }
-  // }
+        return response()->json(['success' => true, 'message' => 'Surat berhasil diselesaikan']);
+      } else {
+        return response()->json(['success' => false, 'message' => 'Surat sudah selesai atau tidak ditemukan']);
+      }
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 
   // // role operator
   // public function terimaVerifikasiOperator($suratId)

@@ -44,7 +44,7 @@ Route::controller(SuratController::class)->group(function () {
     Route::post("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "uploadDokumenBySuratSyaratId");
     // Route::patch("surat/{suratId}/surat-jenis/{suratJenisId}/upload-dokumen/{suratSyaratId}", "updateDokumenBySuratSyaratId");
 
-    // Route::patch("surat/{suratId}/surat-selesai", "suratSelesai");
+    Route::patch("surat/{suratId}/surat-selesai", "suratSelesai");
 
     // // validasi oleh operator
     // Route::patch("surat/{suratId}/terima-verifikasi", "terimaVerifikasiOperator");
