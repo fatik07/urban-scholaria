@@ -127,7 +127,7 @@ class SuratController extends Controller
         return response()->json(['message' => 'Surat tidak ditemukan'], 404);
       }
 
-      if (!$surat->is_dikembalikan === 'Y') {
+      if ($surat->is_dikembalikan === 'Y') {
         $validator = Validator::make($request->all(), [
           "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
           "alamat_lokasi" => "nullable|string|max:255",
@@ -142,12 +142,10 @@ class SuratController extends Controller
           return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $kategori = optional($request->input('kategori'))->get();
         $is_dikembalikan = 'N';
         $alasan_dikembalikan = null;
 
         $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
-        $dataToUpdate['kategori'] = $kategori;
         $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
         $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
 

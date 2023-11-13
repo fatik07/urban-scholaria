@@ -50,7 +50,7 @@ Route::controller(SuratController::class)->group(function () {
     Route::patch("surat/{suratId}/terima-operator", "terimaVerifikasiOperator");
     Route::patch("surat/{suratId}/tolak-operator", "tolakVerifikasiOperator");
 
-    // validasi oleh verifikator
+    // verifikasi oleh verifikator
     Route::patch("surat/{suratId}/terima-verifikator", "terimaVerifikasiVerifikator");
     Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
   });
