@@ -306,7 +306,7 @@ class SuratController extends Controller
     }
   }
 
-  public function suratSelesai($suratId)
+  public function suratDiajukan($suratId)
   {
     try {
       if (auth()->user()->role->nama !== 'Pemohon') {
@@ -321,14 +321,14 @@ class SuratController extends Controller
 
         Notifikasi::create([
           'user_id' => Auth::user()->id,
-          'judul' => 'Permohonan surat telah dibuat',
-          'deskripsi' => 'Segera untuk diverifikasi sebelum tanggal verifikasi habis',
+          'judul' => 'Permohonan surat telah diajukan',
+          'deskripsi' => 'Sekarang, kami sedang memproses tahap validasi operator. Harap tunggu pemberitahuan selanjutnya! !',
           'is_seen' => 'N'
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Surat berhasil diselesaikan']);
+        return response()->json(['success' => true, 'message' => 'Permohonan surat telah diajukan']);
       } else {
-        return response()->json(['success' => false, 'message' => 'Surat sudah selesai atau tidak ditemukan']);
+        return response()->json(['success' => false, 'message' => 'Permohonan surat telah diajukan atau tidak ditemukan']);
       }
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -350,12 +350,12 @@ class SuratController extends Controller
 
       Notifikasi::create([
         'user_id' => $surat->user_id,
-        'judul' => 'Surat berhasil di validasi oleh operator',
-        'deskripsi' => 'Segera untuk cek suratnya',
+        'judul' => 'Selamat surat berhasil divalidasi oleh operator',
+        'deskripsi' => 'Sekarang, kami sedang memproses tahap verifikasi verifikator. Harap tunggu pemberitahuan selanjutnya!',
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi oleh operator']);
+      return response()->json(['success' => true, 'message' => 'Selamat surat berhasil divalidasi oleh operator']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -377,12 +377,12 @@ class SuratController extends Controller
 
       Notifikasi::create([
         'user_id' => $surat->user_id,
-        'judul' => 'Surat gagal di validasi oleh operator',
-        'deskripsi' => 'Segera untuk cek suratnya, untuk melihat alasannya',
+        'judul' => 'Mohon maaf surat anda dikembalikan',
+        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi oleh operator']);
+      return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -403,12 +403,12 @@ class SuratController extends Controller
 
       Notifikasi::create([
         'user_id' => $surat->user_id,
-        'judul' => 'Surat berhasil di validasi oleh verifikator',
-        'deskripsi' => 'Segera untuk cek suratnya',
+        'judul' => 'Selamat surat berhasil diverifikasi oleh verifikator',
+        'deskripsi' => 'Sekarang, kami sedang memproses tahap penjadwalan survey. Harap tunggu pemberitahuan selanjutnya!',
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi berhasil divalidasi oleh verifikator']);
+      return response()->json(['success' => true, 'message' => 'Selamat surat berhasil diverifikasi oleh verifikator']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -430,12 +430,12 @@ class SuratController extends Controller
 
       Notifikasi::create([
         'user_id' => $surat->user_id,
-        'judul' => 'Surat gagal di validasi oleh verifikator',
-        'deskripsi' => 'Segera untuk cek suratnya, untuk melihat alasannya',
+        'judul' => 'Mohon maaf surat anda dikembalikan',
+        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
         'is_seen' => 'N'
       ]);
 
-      return response()->json(['success' => true, 'message' => 'Verifikasi gagal divalidasi oleh verifikator']);
+      return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
