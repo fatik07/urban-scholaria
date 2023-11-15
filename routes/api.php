@@ -60,12 +60,12 @@ Route::controller(SuratController::class)->group(function () {
   });
 });
 
-// Route::controller(SurveyorController::class)->group(function () {
-//   Route::middleware("auth:sanctum")->group(function () {
-//     Route::get("surveyors", "index");
-//     // Route::get("surveyors", "getRoleSurveyors");
-//   });
-// });
+Route::controller(SurveyorController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::get("surveyors", "index");
+    // Route::get("surveyors", "getRoleSurveyors");
+  });
+});
 
 Route::controller(SuratJenisController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
