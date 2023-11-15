@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\PdfController;
 use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratDokumenController;
 use App\Http\Controllers\API\SuratJenisController;
 use App\Http\Controllers\API\SuratSyaratController;
+use App\Http\Controllers\API\SurveyorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,8 +55,17 @@ Route::controller(SuratController::class)->group(function () {
     // verifikasi oleh verifikator
     Route::patch("surat/{suratId}/terima-verifikator", "terimaVerifikasiVerifikator");
     Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
+
+    Route::post("surat/{suratId}/set-jadwal-survey", "setJadwalSurvey");
   });
 });
+
+// Route::controller(SurveyorController::class)->group(function () {
+//   Route::middleware("auth:sanctum")->group(function () {
+//     Route::get("surveyors", "index");
+//     // Route::get("surveyors", "getRoleSurveyors");
+//   });
+// });
 
 Route::controller(SuratJenisController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
@@ -75,3 +86,5 @@ Route::controller(SuratSyaratController::class)->group(function () {
     // Route::delete("surat-syarat/{id}", "destroy");
   });
 });
+
+// Route::get('surat/{surat_id}/pdf', [PdfController::class, 'generatePDF']);

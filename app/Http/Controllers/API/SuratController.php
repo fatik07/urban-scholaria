@@ -8,7 +8,9 @@ use App\Models\Surat;
 use App\Models\SuratDokumen;
 use App\Models\SuratJenis;
 use App\Models\SuratSyarat;
+use App\Models\Survey;
 use Auth;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -434,6 +436,64 @@ class SuratController extends Controller
       ]);
 
       return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function setJadwalSurvey(Request $request, $suratId)
+  {
+    try {
+      $validator = Validator::make($request->all(), [
+        "surat_id" => "nullable|exists:surat,id",
+        "user_id" => "required|exists:user,id",
+        "jadwal_survey" => "required|date",
+        "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
+        "alamat_survey" => "nullable|string|max:255",
+      ]);
+
+      if ($validator->fails()) {
+        return response()->json($validator->errors());
+      };
+
+      $surat = Surat::findOrFail($suratId);
+
+      if ($surat->status !== 'Penjadwalan Survey') {
+        return response()->json(['message' => 'Surat tidak dapat dijadwalkan untuk survey saat ini'], 400);
+      }
+
+      // Pastikan user yang membuat jadwal adalah verifikator
+      if (auth()->user()->role->nama === 'Verifikator') {
+        $survey = Survey::create([
+          'surat_id' => $suratId,
+          'user_id' => $request->user_id,
+          'jadwal_survey' => Carbon::parse($request->jadwal_survey)->toDateTimeString(),
+          'status' => 'Belum Disurvey',
+          'alamat_survey' => null,
+        ]);
+
+        $surat->update(['status' => 'Verifikasi Hasil Survey']);
+
+        // buat pemohon
+        Notifikasi::create([
+          'user_id' => $surat->user_id,
+          'judul' => 'Selamat jadwal survey telah ditentukan',
+          'deskripsi' => 'Kami memberitahukan bahwa jadwal survey untuk surat dengan nomor ' . $suratId . ' berhasil ditentukan. Mohon segera cek jadwal Anda dan pastikan kesiapan untuk melaksanakan survey',
+          'is_seen' => 'N'
+        ]);
+
+        // buat surveyor
+        Notifikasi::create([
+          'user_id' => $survey->user_id,
+          'judul' => 'Selamat jadwal survey telah ditentukan',
+          'deskripsi' => 'Kami memberitahukan bahwa jadwal survey untuk surat dengan nomor ' . $suratId . ' berhasil ditentukan. Mohon segera cek jadwal Anda dan pastikan kesiapan untuk melaksanakan survey',
+          'is_seen' => 'N'
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Jadwal survey berhasil ditetapkan']);
+      } else {
+        return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk menetapkan jadwal survey'], 403);
+      }
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }

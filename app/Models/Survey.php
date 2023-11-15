@@ -12,4 +12,9 @@ class Survey extends Model
   public $table = 'survey';
 
   protected $fillable = ['surat_id', 'user_id', 'jadwal_survey', 'status', 'foto_survey', 'alamat_survey', 'longitude', 'latitude', 'dokumen_survey', 'alasan_ditolak'];
+
+  public function surat()
+  {
+    return $this->belongsTo(Surat::class, 'surat_id');
+  }
 }
