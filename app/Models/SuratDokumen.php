@@ -17,4 +17,9 @@ class SuratDokumen extends Model
   {
     return $this->belongsTo(Surat::class, 'surat_id', 'id');
   }
+
+  public function suratSyarat()
+  {
+    return $this->belongsTo(SuratSyarat::class, 'surat_syarat_id', 'id');
+  }
 }
