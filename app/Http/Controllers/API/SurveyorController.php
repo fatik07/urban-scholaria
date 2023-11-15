@@ -54,11 +54,4 @@ class SurveyorController extends Controller
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
   }
-
-  public function getRoleSurveyors()
-  {
-    $surveyors = User::where('role_id', 6)->get();
-
-    return response()->json(['success' => true, 'message' => 'Berhasil mendapatkan semua role surveyor', 'data' => $surveyors]);
-  }
 }
