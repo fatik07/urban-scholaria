@@ -449,7 +449,6 @@ class SuratController extends Controller
       $validator = Validator::make($request->all(), [
         "surat_id" => "nullable|exists:surat,id",
         "user_id" => "required|exists:user,id",
-        "jadwal_survey" => "required|date",
         "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
         "alamat_survey" => "nullable|string|max:255",
       ]);
@@ -469,12 +468,11 @@ class SuratController extends Controller
         $survey = Survey::create([
           'surat_id' => $suratId,
           'user_id' => $request->user_id,
-          'jadwal_survey' => Carbon::parse($request->jadwal_survey)->toDateTimeString(),
           'status' => 'Belum Disurvey',
           'alamat_survey' => null,
         ]);
 
-        $surat->update(['status' => 'Verifikasi Hasil Survey', 'jadwal_survey' => $survey->jadwal_survey]);
+        $surat->update(['status' => 'Verifikasi Hasil Survey', 'jadwal_survey' => Carbon::parse($request->jadwal_survey)->toDateTimeString()]);
 
         // buat pemohon
         Notifikasi::create([
@@ -511,6 +509,7 @@ class SuratController extends Controller
 
       $validator = Validator::make($request->all(), [
         "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
+        "jadwal_survey" => "required|date",
         "alamat_survey" => "nullable|string|max:255",
         "foto_survey" => "nullable|mimes:jpeg,png,jpg,gif,svg",
         "longitude" => "nullable|numeric",
@@ -548,10 +547,11 @@ class SuratController extends Controller
         $path = $survey->dokumen_survey;
       }
 
-      $dataToUpdate = $request->only(['status', 'alamat_survey', 'foto_survey', 'longitude', 'latitude', 'dokumen_survey']);
+      $dataToUpdate = $request->only(['status', 'jadwal_survey', 'alamat_survey', 'foto_survey', 'longitude', 'latitude', 'dokumen_survey']);
       $dataToUpdate['status'] = "Sudah Disurvey";
       $dataToUpdate['foto_survey'] = $pathFoto;
       $dataToUpdate['dokumen_survey'] = $path;
+      $dataToUpdate['jadwal_survey'] = Carbon::parse($request->jadwal_survey)->toDateTimeString();
 
       $survey->update($dataToUpdate);
 
