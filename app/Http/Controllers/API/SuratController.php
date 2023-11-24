@@ -73,6 +73,7 @@ class SuratController extends Controller
 
       $validator = Validator::make($request->all(), [
         "user_id" => "nullable|exists:user,id",
+        "nama" => "nullable|string|max:255",
         "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
         "is_ulasan" => "nullable|in:Y,N",
         "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
@@ -91,6 +92,7 @@ class SuratController extends Controller
 
       $surat = Surat::create([
         "user_id" => Auth::user()->id,
+        "nama" => $request->nama,
         "status" => 'Pengisian Dokumen',
         "is_ulasan" => 'N',
         "kategori" => $request->kategori,
@@ -472,7 +474,7 @@ class SuratController extends Controller
           'alamat_survey' => null,
         ]);
 
-        $surat->update(['status' => 'Verifikasi Hasil Survey']);
+        $surat->update(['status' => 'Verifikasi Hasil Survey', 'jadwal_survey' => $survey->jadwal_survey]);
 
         // buat pemohon
         Notifikasi::create([
