@@ -388,7 +388,7 @@ class SuratController extends Controller
     }
   }
 
-  // // role verifikator
+  // role verifikator
   public function terimaVerifikasiVerifikator($suratId)
   {
     try {
@@ -494,6 +494,85 @@ class SuratController extends Controller
       } else {
         return response()->json(['success' => false, 'message' => 'Anda tidak memiliki izin untuk menetapkan jadwal survey'], 403);
       }
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  // role surveyor
+  public function terimaHasilSurvey(Request $request, $surveyId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Surveyor') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $validator = Validator::make($request->all(), [
+        "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
+        "alamat_survey" => "nullable|string|max:255",
+        "foto_survey" => "nullable|mimes:jpeg,png,jpg,gif,svg",
+        "longitude" => "nullable|numeric",
+        "latitude" => "nullable|numeric",
+        "dokumen_survey" => "nullable|mimes:pdf,doc,docx",
+      ]);
+
+      if ($validator->fails()) {
+        return response()->json($validator->errors());
+      };
+
+      $survey = Survey::findOrFail($surveyId);
+
+      // foto
+      if ($request->hasFile('foto_survey')) {
+        if ($survey->foto_survey) {
+          Storage::delete("public/documents/survey/foto-survey/" . basename($survey->foto_survey));
+        }
+
+        $fotoUpload = $request->file('foto_survey');
+        $pathFoto = $fotoUpload->storeAs("public/documents/survey/foto-survey", $fotoUpload->getClientOriginalName());
+      } else {
+        $pathFoto = $survey->foto_survey;
+      }
+
+      // dokumen
+      if ($request->hasFile('dokumen_survey')) {
+        if ($survey->dokumen_survey) {
+          Storage::delete("public/documents/survey/dokumen-survey/" . basename($survey->dokumen_survey));
+        }
+
+        $dokumenUpload = $request->file('dokumen_survey');
+        $path = $dokumenUpload->storeAs("public/documents/survey/dokumen-survey", $dokumenUpload->getClientOriginalName());
+      } else {
+        $path = $survey->dokumen_survey;
+      }
+
+      $dataToUpdate = $request->only(['status', 'alamat_survey', 'foto_survey', 'longitude', 'latitude', 'dokumen_survey']);
+      $dataToUpdate['status'] = "Sudah Disurvey";
+      $dataToUpdate['foto_survey'] = $pathFoto;
+      $dataToUpdate['dokumen_survey'] = $path;
+
+      $survey->update($dataToUpdate);
+
+      $surat = $survey->surat;
+      $surat->update(['status' => 'Verifikasi Hasil Survey']);
+
+      // buat pemohon
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Selamat survey anda telah diselesaikan',
+        'deskripsi' => 'Kami memberitahukan bahwa survey anda untuk surat dengan nomor ' . $survey->id . ' berhasil diselesaikan. Mohon segera cek jadwal Anda dan pastikan kesiapan untuk melaksanakan survey',
+        'is_seen' => 'N'
+      ]);
+
+      // buat verifikator
+      Notifikasi::create([
+        'user_id' => $survey->user_id,
+        'judul' => 'Selamat survey anda telah diselesaikan',
+        'deskripsi' => 'Kami memberitahukan bahwa survey anda untuk surat dengan nomor ' . $survey->id . ' berhasil diselesaikan. Mohon segera cek jadwal Anda dan pastikan kesiapan untuk melaksanakan survey',
+        'is_seen' => 'N'
+      ]);
+
+      return response()->json(['success' => true, 'message' => 'survey berhasil diselesaikan']);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }

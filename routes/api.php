@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\PdfController;
 use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratDokumenController;
@@ -57,6 +58,9 @@ Route::controller(SuratController::class)->group(function () {
     Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
 
     Route::post("surat/{suratId}/set-jadwal-survey", "setJadwalSurvey");
+
+    // verifikasi oleh surveyor
+    Route::post("survey/{surveyId}/set-hasil-survey", "terimaHasilSurvey");
   });
 });
 
@@ -65,6 +69,15 @@ Route::controller(SurveyorController::class)->group(function () {
     Route::get("surveyors", "index");
   });
 });
+
+// Route::controller(ChatController::class)->group(function () {
+//   // Route::middleware("auth:sanctum")->group(function () {
+//   Route::get("chat/room-chats", "getRoomChats");
+//   Route::get("chat/list-chats", "getListChats");
+//   Route::post("chat/send-message", "sendMessage");
+//   Route::get("chat/{roomchat_id}", "showChat");
+//   // });
+// });
 
 Route::controller(SuratJenisController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
