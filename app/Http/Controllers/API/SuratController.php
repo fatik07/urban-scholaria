@@ -83,6 +83,7 @@ class SuratController extends Controller
         "jadwal_survey" => "nullable|date",
         "nomor_penerbitan" => "nullable|string|max:255",
         "is_dikembalikan" => "nullable|in:Y,N",
+        "is_terlambat" => "nullable|in:Y,N",
         "alasan_dikembalikan" => "nullable|string|max:255",
       ]);
 
@@ -102,6 +103,7 @@ class SuratController extends Controller
         "jadwal_survey" => null,
         "nomor_penerbitan" => null,
         "is_dikembalikan" => 'N',
+        "is_terlambat" => 'N',
         "alasan_dikembalikan" => null
       ]);
 
@@ -138,6 +140,7 @@ class SuratController extends Controller
           "longitude" => "nullable|string|max:255",
           "latitude" => "nullable|string|max:255",
           "is_dikembalikan" => "nullable|in:Y,N",
+          "is_terlambat" => "nullable|in:Y,N",
           "alasan_dikembalikan" => "nullable|string|max:255",
           'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
         ]);
@@ -147,10 +150,12 @@ class SuratController extends Controller
         }
 
         $is_dikembalikan = 'N';
+        $is_terlambat = 'N';
         $alasan_dikembalikan = null;
 
-        $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'alasan_dikembalikan']);
+        $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'is_terlambat', 'alasan_dikembalikan']);
         $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
+        $dataToUpdate['is_terlambat'] = $is_terlambat;
         $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
 
         $surat->update($dataToUpdate);
@@ -337,7 +342,7 @@ class SuratController extends Controller
     }
   }
 
-  // // role operator
+  // role operator
   public function terimaVerifikasiOperator($suratId)
   {
     try {
@@ -348,6 +353,7 @@ class SuratController extends Controller
       $surat = Surat::findOrFail($suratId);
 
       $surat->status = 'Verifikasi Verifikator';
+      $surat->is_terlambat = 'N';
       $surat->save();
 
       Notifikasi::create([
@@ -374,6 +380,7 @@ class SuratController extends Controller
 
       $surat->status = 'Pengisian Dokumen';
       $surat->is_dikembalikan = 'Y';
+      $surat->is_terlambat = 'N';
       $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
       $surat->save();
 
@@ -401,6 +408,7 @@ class SuratController extends Controller
       $surat = Surat::findOrFail($suratId);
 
       $surat->status = 'Penjadwalan Survey';
+      $surat->is_terlambat = 'N';
       $surat->save();
 
       Notifikasi::create([
@@ -427,6 +435,7 @@ class SuratController extends Controller
 
       $surat->status = 'Pengisian Dokumen';
       $surat->is_dikembalikan = 'Y';
+      $surat->is_terlambat = 'N';
       $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
       $surat->save();
 
