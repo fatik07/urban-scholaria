@@ -27,30 +27,59 @@ class SuratController extends Controller
     try {
       if (auth()->user()->role->nama !== 'Pemohon') {
         $status = $request->query('status');
+        $nama = $request->query('nama');
+        $kategori = $request->query('kategori');
+        $order = $request->query('order_by');
 
-        if ($status) {
-          $query = Surat::with('suratDokumen');
+        if ($status || $nama || $kategori || $order) {
+          $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
+          $message = "Surat berhasil didapatkan";
 
           if ($status) {
             $query->where('status', $status);
+            $message .= " dengan status " . $status;
+          }
+
+          if ($nama) {
+            $query->whereHas('suratDokumen.suratSyarat.suratJenis', function ($query) use ($nama) {
+              $query->where('nama', 'like', "%$nama%");
+            });
+            $message .= " dengan nama " . $nama;
+          }
+
+          if ($kategori) {
+            $query->where('kategori', $kategori);
+            $message .= " dengan kategori " . $kategori;
+          }
+
+          if ($order) {
+            $query->orderBy('created_at', $order);
+            $message .= " dengan order by " . $order;
           }
 
           $surat = $query->get();
 
-          return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan dengan status verifikasi operator', 'data' => $surat]);
+          if ($surat->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Maaf, nilai parameter tidak sesuai']);
+          }
+
+          return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
         } else {
-          $surat = Surat::with('suratDokumen')->get();
+          $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->get();
 
           return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
         }
       } else {
         $status = $request->query('status');
+        $nama = $request->query('nama');
+        $kategori = $request->query('kategori');
+        $order = $request->query('order_by', 'asc');
 
-        if ($status) {
+        if ($status || $nama || $kategori || $order) {
           return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
-        $surat = Surat::with('suratDokumen')->get();
+        $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->get();
 
         return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
       }
@@ -199,7 +228,7 @@ class SuratController extends Controller
         return response()->json(['message' => 'Akses ditolak'], 403);
       }
 
-      $surat = Surat::where('user_id', $userId)->get();
+      $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->where('user_id', $userId)->get();
 
       if ($surat) {
         return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan berdasarkan pemohon', 'data' => $surat]);
@@ -216,7 +245,7 @@ class SuratController extends Controller
         return response()->json(['message' => 'Akses ditolak'], 403);
       }
 
-      $syarat = SuratSyarat::where('surat_jenis_id', $suratJenisId)->get();
+      $syarat = SuratSyarat::with('suratJenis')->where('surat_jenis_id', $suratJenisId)->get();
 
       return response()->json(['success' => true, 'data' => $syarat]);
     } catch (\Exception $e) {
@@ -256,6 +285,8 @@ class SuratController extends Controller
         'surat_syarat_id' => $suratSyaratId,
         'dokumen_upload' => $dokumenPath,
       ]);
+
+      $suratDokumen->load(['surat', 'suratSyarat.suratJenis']);
 
       return response()->json(['message' => 'Surat dokumen berhasil diunggah', 'data' => $suratDokumen]);
     } catch (\Exception $e) {
@@ -306,6 +337,8 @@ class SuratController extends Controller
       $suratDokumen->update(['dokumen_upload' => $path]);
 
       $suratDokumen->surat->update(['is_dikembalikan' => 'N', 'alasan_dikembalikan' => null]);
+
+      $suratDokumen->load(['surat', 'suratSyarat.suratJenis']);
 
       return response()->json(['message' => 'Surat dokumen berhasil diupdate.', 'data' => $suratDokumen]);
     } catch (\Exception $e) {
