@@ -32,6 +32,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::post("aktivasi-akun/{userId}", "activateAccount");
 
     Route::post("logout", "logout");
+
+    Route::get("users", "users");
   });
 });
 
@@ -58,6 +60,9 @@ Route::controller(SuratController::class)->group(function () {
     Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
 
     Route::post("surat/{suratId}/set-jadwal-survey", "setJadwalSurvey");
+
+    Route::post("surat/{suratId}/terima-hasil-survey", "terimaVerifikasiSurvey");
+    Route::post("surat/{suratId}/tolak-hasil-survey", "tolakVerifikasiSurvey");
 
     // verifikasi oleh surveyor
     Route::post("survey/{surveyId}/set-hasil-survey", "terimaHasilSurvey");

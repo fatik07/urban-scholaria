@@ -16,7 +16,6 @@ class AuthController extends Controller
   {
     try {
       $validator = Validator::make($request->all(), [
-        "role_id" => "required|exists:role,id",
         "username" => "required|string|max:255",
         "email" => "required|string|max:255|unique:user",
         "password" => "required|string|min:8",
@@ -42,7 +41,7 @@ class AuthController extends Controller
       }
 
       $user = User::create([
-        'role_id' => $request->role_id,
+        'role_id' => 9,
         'username' => $request->username,
         'email' => $request->email,
         'password' => Hash::make($request->password),
@@ -213,6 +212,39 @@ class AuthController extends Controller
       });
 
       return response()->json(['success' => true, 'message' => 'Selamat, segera cek email anda !']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function users(Request $request)
+  {
+    try {
+      if (auth()->user()->role->nama === 'Pemohon') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $userId = $request->query('user_id');
+      $role = $request->query('role');
+
+      $query = User::with('role');
+      $message = "Semua user";
+
+      if ($userId) {
+        $query->where('id', $userId);
+        $message = "Filter user dengan id = " . $userId;
+      }
+
+      if ($role) {
+        $query->whereHas('role', function ($query) use ($role) {
+          $query->where('nama', $role);
+        });
+        $message = "Filter user dengan role = " . $role;
+      }
+
+      $users = $query->get();
+
+      return response()->json(['success' => true, 'message' => $message, 'data' => $users]);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
