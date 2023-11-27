@@ -275,4 +275,26 @@ class AuthController extends Controller
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
   }
+
+  public function setRole(Request $request, User $user)
+  {
+    try {
+      $validatedData = $request->validate([
+        'role_id' => 'required|exists:roles,id',
+      ]);
+
+      $role = Role::find($validatedData['role_id']);
+
+      if (!$role) {
+        return response()->json(['success' => false, 'message' => 'Role tidak valid'], 400);
+      }
+
+      $user->role()->associate($role);
+      $user->save();
+
+      return response()->json(['success' => true, 'message' => 'Role berhasil diubah', 'data' => $user]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 }

@@ -36,6 +36,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::get("users", "users");
 
     Route::get("roles", "roles");
+
+    Route::get("set-role/{user}", "setRole");
   });
 });
 
