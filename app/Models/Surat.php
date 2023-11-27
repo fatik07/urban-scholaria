@@ -17,4 +17,26 @@ class Surat extends Model
   {
     return $this->hasMany(SuratDokumen::class, 'surat_id', 'id');
   }
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    static::updating(function ($surat) {
+      if ($surat->isDirty('status') && $surat->status === 'Selesai') {
+        $surat->nomor_penerbitan = $surat->generateNomorPenerbitan();
+      }
+    });
+  }
+
+  public function generateNomorPenerbitan()
+  {
+    $lastNomorPenerbitan = static::where('status', 'Selesai')
+      ->max('nomor_penerbitan');
+
+    // Pemisahan nomor penerbitan untuk mendapatkan angka terakhir
+    $lastNumber = intval(explode('/', $lastNomorPenerbitan)[0] ?? 0);
+
+    return sprintf('%02d/DP/%d', $lastNumber + 1, now()->year);
+  }
 }
