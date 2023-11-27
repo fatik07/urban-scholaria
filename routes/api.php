@@ -34,6 +34,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::post("logout", "logout");
 
     Route::get("users", "users");
+
+    Route::get("roles", "roles");
   });
 });
 

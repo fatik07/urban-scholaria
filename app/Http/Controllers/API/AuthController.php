@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -245,6 +246,31 @@ class AuthController extends Controller
       $users = $query->get();
 
       return response()->json(['success' => true, 'message' => $message, 'data' => $users]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function roles(Request $request)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Admin Utama') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $nama = $request->query('nama');
+
+      $query = Role::query();
+      $message = "Semua role";
+
+      if ($nama) {
+        $query->where('nama', $nama);
+        $message = "Filter role dengan nama = " . $nama;
+      }
+
+      $roles = $query->get();
+
+      return response()->json(['success' => true, 'message' => $message, 'data' => $roles]);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
