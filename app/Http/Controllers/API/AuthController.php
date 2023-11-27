@@ -279,8 +279,12 @@ class AuthController extends Controller
   public function setRole(Request $request, User $user)
   {
     try {
+      if (auth()->user()->role->nama !== 'Admin Utama') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
       $validatedData = $request->validate([
-        'role_id' => 'required|exists:roles,id',
+        'role_id' => 'required|exists:role,id',
       ]);
 
       $role = Role::find($validatedData['role_id']);
