@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ChatController;
+use App\Http\Controllers\API\FeedbackController;
 use App\Http\Controllers\API\PdfController;
 use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratDokumenController;
@@ -76,6 +77,12 @@ Route::controller(SuratController::class)->group(function () {
 Route::controller(SurveyorController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
     Route::get("surveyors", "index");
+  });
+});
+
+Route::controller(FeedbackController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::post("feedback-pemohon", "index");
   });
 });
 
