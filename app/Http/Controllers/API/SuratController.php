@@ -366,12 +366,11 @@ class SuratController extends Controller
         $surat->status = 'Verifikasi Operator';
         $surat->save();
 
-        Notifikasi::create([
-          'user_id' => Auth::user()->id,
-          'judul' => 'Permohonan surat telah diajukan',
-          'deskripsi' => 'Sekarang, kami sedang memproses tahap validasi operator. Harap tunggu pemberitahuan selanjutnya! !',
-          'is_seen' => 'N'
-        ]);
+        PushNotificationController::sendMessage(
+          Auth::user()->id,
+          'Permohonan surat telah diajukan',
+          'Sekarang, kami sedang memproses tahap validasi operator. Harap tunggu pemberitahuan selanjutnya!'
+        );
 
         return response()->json(['success' => true, 'message' => 'Permohonan surat telah diajukan']);
       } else {
@@ -400,12 +399,11 @@ class SuratController extends Controller
       $surat->is_terlambat = 'N';
       $surat->save();
 
-      Notifikasi::create([
-        'user_id' => $surat->user_id,
-        'judul' => 'Selamat surat berhasil divalidasi oleh operator',
-        'deskripsi' => 'Sekarang, kami sedang memproses tahap verifikasi verifikator. Harap tunggu pemberitahuan selanjutnya!',
-        'is_seen' => 'N'
-      ]);
+      PushNotificationController::sendMessage(
+        $surat->user_id,
+        'Selamat surat berhasil divalidasi oleh operator',
+        'Sekarang, kami sedang memproses tahap verifikasi verifikator. Harap tunggu pemberitahuan selanjutnya!'
+      );
 
       return response()->json(['success' => true, 'message' => 'Selamat surat berhasil divalidasi oleh operator']);
     } catch (\Exception $e) {
@@ -432,12 +430,11 @@ class SuratController extends Controller
       $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
       $surat->save();
 
-      Notifikasi::create([
-        'user_id' => $surat->user_id,
-        'judul' => 'Mohon maaf surat anda dikembalikan',
-        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
-        'is_seen' => 'N'
-      ]);
+      PushNotificationController::sendMessage(
+        $surat->user_id,
+        'Mohon maaf surat anda dikembalikan',
+        'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini'
+      );
 
       return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
     } catch (\Exception $e) {
@@ -463,12 +460,11 @@ class SuratController extends Controller
       $surat->is_terlambat = 'N';
       $surat->save();
 
-      Notifikasi::create([
-        'user_id' => $surat->user_id,
-        'judul' => 'Selamat surat berhasil diverifikasi oleh verifikator',
-        'deskripsi' => 'Sekarang, kami sedang memproses tahap penjadwalan survey. Harap tunggu pemberitahuan selanjutnya!',
-        'is_seen' => 'N'
-      ]);
+      PushNotificationController::sendMessage(
+        $surat->user_id,
+        'Selamat surat berhasil diverifikasi oleh verifikator',
+        'Sekarang, kami sedang memproses tahap penjadwalan survey. Harap tunggu pemberitahuan selanjutnya!'
+      );
 
       return response()->json(['success' => true, 'message' => 'Selamat surat berhasil diverifikasi oleh verifikator']);
     } catch (\Exception $e) {
@@ -495,12 +491,11 @@ class SuratController extends Controller
       $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
       $surat->save();
 
-      Notifikasi::create([
-        'user_id' => $surat->user_id,
-        'judul' => 'Mohon maaf surat anda dikembalikan',
-        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
-        'is_seen' => 'N'
-      ]);
+      PushNotificationController::sendMessage(
+        $surat->user_id,
+        'Mohon maaf surat anda dikembalikan',
+        'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini'
+      );
 
       return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
     } catch (\Exception $e) {
