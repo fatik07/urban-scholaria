@@ -26,14 +26,20 @@ class SuratController extends Controller
   {
     try {
       if (auth()->user()->role->nama !== 'Pemohon') {
+        $suratId = $request->query('id_surat');
         $status = $request->query('status');
         $nama = $request->query('nama');
         $kategori = $request->query('kategori');
         $order = $request->query('order_by');
 
-        if ($status || $nama || $kategori || $order) {
+        if ($suratId || $status || $nama || $kategori || $order) {
           $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
           $message = "Surat berhasil didapatkan";
+
+          if ($suratId) {
+            $query->where('id', $suratId);
+            $message .= " dengan id " . $suratId;
+          }
 
           if ($status) {
             $query->where('status', $status);
@@ -70,12 +76,13 @@ class SuratController extends Controller
           return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
         }
       } else {
+        $suratId = $request->query('id_surat');
         $status = $request->query('status');
         $nama = $request->query('nama');
         $kategori = $request->query('kategori');
         $order = $request->query('order_by', 'asc');
 
-        if ($status || $nama || $kategori || $order) {
+        if ($suratId || $status || $nama || $kategori || $order) {
           return response()->json(['message' => 'Akses ditolak'], 403);
         }
 
