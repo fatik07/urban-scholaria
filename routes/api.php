@@ -115,4 +115,4 @@ Route::controller(SuratSyaratController::class)->group(function () {
   });
 });
 
-// Route::get('surat/{surat_id}/pdf', [PdfController::class, 'generatePDF']);
+Route::get('surat/{surat_id}/cetak-kwitansi', [PdfController::class, 'cetakKwitansi']);
