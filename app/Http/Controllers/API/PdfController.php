@@ -18,7 +18,7 @@ class PdfController extends Controller
 
     $url = url("/api/surat?id_surat={$nomor_surat}");
 
-    $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate($url));
+    $qrcode = base64_encode(QrCode::format('svg')->size(400)->errorCorrection('H')->generate($url));
 
     $data = [
       'surat' => $surat,

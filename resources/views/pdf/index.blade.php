@@ -16,8 +16,8 @@
     body {
       font-family: 'Arial, sans-serif';
       text-align: center;
-      background-color: #fff;
-      /* background-color: #191d88; */
+      /* background-color: #fff; */
+      background-color: #191d88;
     }
 
     .container {
