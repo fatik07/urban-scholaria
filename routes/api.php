@@ -116,3 +116,4 @@ Route::controller(SuratSyaratController::class)->group(function () {
 });
 
 Route::get('surat/{surat_id}/cetak-kwitansi', [PdfController::class, 'cetakKwitansi']);
+Route::get('surat/{surat_id}/cetak-surat', [PdfController::class, 'cetakSurat']);
