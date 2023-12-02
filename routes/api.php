@@ -127,7 +127,9 @@ Route::controller(SuratSyaratController::class)->group(function () {
 });
 
 Route::controller(PdfController::class)->group(function () {
-  Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
-  Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
-  Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
+    Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
+    Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
+  });
 });
