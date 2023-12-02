@@ -25,12 +25,13 @@ use Illuminate\Support\Facades\Route;
 Route::controller(AuthController::class)->group(function () {
   Route::post("register", "register");
   Route::post("login", "login");
+  Route::get("aktivasi-akun/{token}", "activateAccount")->name('activate.account');
 
   Route::middleware("auth:sanctum")->group(function () {
     Route::get("profile", "getProfile");
     Route::patch("update-profile", "updateProfile");
 
-    Route::post("aktivasi-akun/{userId}", "activateAccount");
+    // Route::post("aktivasi-akun/{userId}", "activateAccount");
 
     Route::post("logout", "logout");
 
@@ -115,5 +116,8 @@ Route::controller(SuratSyaratController::class)->group(function () {
   });
 });
 
-Route::get('surat/{surat_id}/cetak-kwitansi', [PdfController::class, 'cetakKwitansi']);
-Route::get('surat/{surat_id}/cetak-surat', [PdfController::class, 'cetakSurat']);
+Route::controller(PdfController::class)->group(function () {
+  Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
+  Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
+  Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
+});

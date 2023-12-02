@@ -61,4 +61,37 @@ class PdfController extends Controller
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
   }
+
+  public function cetakLegalitas($surat_id)
+  {
+    try {
+      $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+
+      // Get the SuratDokumen for the specified Surat
+      $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
+
+      // Initialize empty arrays for suratSyarat and suratJenis
+      $suratSyarat = [];
+      $suratJenis = [];
+
+      // Loop through each SuratDokumen and retrieve suratSyarat and suratJenis
+      foreach ($suratDokumen as $dokumen) {
+        $suratSyarat[] = $dokumen->suratSyarat;
+        $suratJenis[] = $dokumen->suratSyarat->suratJenis;
+      }
+
+      $data = [
+        'surat' => $surat,
+        'suratDokumen' => $suratDokumen,
+        'suratSyarat' => $suratSyarat,
+        'suratJenis' => $suratJenis,
+      ];
+
+      $pdf = PDF::loadView('pdf.cetak-legalitas', $data);
+
+      return $pdf->stream("surat_legalitas_{$surat->id}.pdf");
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
 }
