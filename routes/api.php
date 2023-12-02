@@ -109,10 +109,10 @@ Route::controller(SuratJenisController::class)->group(function () {
 Route::controller(SuratSyaratController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
     Route::get("surat-syarat", "index");
-    // Route::post("surat-syarat", "create");
+    Route::post("surat-syarat", "create");
     Route::get("surat-syarat/{id}", "show");
-    // Route::patch("surat-syarat/{id}", "update");
-    // Route::delete("surat-syarat/{id}", "destroy");
+    Route::patch("surat-syarat/{id}", "update");
+    Route::delete("surat-syarat/{id}", "destroy");
   });
 });
 
