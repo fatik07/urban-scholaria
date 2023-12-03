@@ -20,23 +20,24 @@ class AuthController extends Controller
   {
     try {
       $validator = Validator::make($request->all(), [
-        // "username" => "required|string|max:255",
+        "username" => "required|string|max:255",
         "email" => "required|string|max:255|unique:user",
         "password" => "required|string|min:8",
-        // "nama_lengkap" => "required|string|max:255",
-        // "foto" => "nullable|mimes:jpeg,png,jpg",
-        // "jenis_identitas" => "nullable|in:KTP,Paspor",
-        // "nomor_identitas" => "nullable|string|max:100|unique:user,nomor_identitas",
-        // "jenis_kelamin" => "nullable|in:Laki-Laki,Perempuan",
-        // "tempat_lahir" => "nullable|string|max:100",
-        // "tanggal_lahir" => "nullable|date",
-        // "provinsi" => "nullable|string|max:100",
-        // "kabupaten_kota" => "nullable|string|max:100",
-        // "kecamatan" => "nullable|string|max:100",
-        // "kelurahan" => "nullable|string|max:100",
-        // "alamat" => "nullable|string",
-        // "no_telp" => "nullable|string|max:100|unique:user,no_telp",
-        // "pekerjaan" => "nullable|string|max:100",
+        "nama_lengkap" => "required|string|max:255",
+        "foto" => "nullable|mimes:jpeg,png,jpg",
+        "ktp" => "nullable|mimes:jpeg,png,jpg",
+        "jenis_identitas" => "nullable|in:KTP,Paspor",
+        "nomor_identitas" => "nullable|string|max:100|unique:user,nomor_identitas",
+        "jenis_kelamin" => "nullable|in:Laki-Laki,Perempuan",
+        "tempat_lahir" => "nullable|string|max:100",
+        "tanggal_lahir" => "nullable|date",
+        "provinsi" => "nullable|string|max:100",
+        "kabupaten_kota" => "nullable|string|max:100",
+        "kecamatan" => "nullable|string|max:100",
+        "kelurahan" => "nullable|string|max:100",
+        "alamat" => "nullable|string",
+        "no_telp" => "nullable|string|max:100|unique:user,no_telp",
+        "pekerjaan" => "nullable|string|max:100",
         "is_login" => "nullable|in:Y,N",
         "is_active" => "nullable|in:Y,N",
       ]);
@@ -45,58 +46,67 @@ class AuthController extends Controller
         return response()->json($validator->errors());
       }
 
-      // foto
-      // if ($request->hasFile('foto_survey')) {
-      //   $fotoUpload = $request->file('foto_survey');
-      //   $pathFoto = $fotoUpload->storeAs("public/foto-profile", $fotoUpload->getClientOriginalName());
-      // } else {
-      //   $pathFoto = null;
-      // }
+      //foto
+      if ($request->hasFile('foto')) {
+        $fotoUpload = $request->file('foto');
+        $pathFoto = $fotoUpload->storeAs("public/foto-profile", $fotoUpload->getClientOriginalName());
+      } else {
+        $pathFoto = null;
+      }
+
+      //ktp
+      if ($request->hasFile('ktp')) {
+        $fotoUpload = $request->file('ktp');
+        $pathKtp = $fotoUpload->storeAs("public/foto-ktp", $fotoUpload->getClientOriginalName());
+      } else {
+        $pathKtp = null;
+      }
 
       $user = User::create([
         'role_id' => 9,
-        // 'username' => $request->username,
+        'username' => $request->username,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        // 'nama_lengkap' => $request->nama_lengkap,
-        // 'foto' => $pathFoto,
-        // 'jenis_identitas' => $request->jenis_identitas,
-        // 'nomor_identitas' => $request->nomor_identitas,
-        // 'jenis_kelamin' => $request->jenis_kelamin,
-        // 'tempat_lahir' => $request->tempat_lahir,
-        // 'tanggal_lahir' => $request->tanggal_lahir,
-        // 'provinsi' => $request->provinsi,
-        // 'kabupaten_kota' => $request->kabupaten_kota,
-        // 'kecamatan' => $request->kecamatan,
-        // 'kelurahan' => $request->kelurahan,
-        // 'alamat' => $request->alamat,
-        // 'no_telp' => $request->no_telp,
-        // 'pekerjaan' => $request->pekerjaan,
+        'nama_lengkap' => $request->nama_lengkap,
+        'foto' => $pathFoto,
+        'ktp' => $pathKtp,
+        'jenis_identitas' => $request->jenis_identitas,
+        'nomor_identitas' => $request->nomor_identitas,
+        'jenis_kelamin' => $request->jenis_kelamin,
+        'tempat_lahir' => $request->tempat_lahir,
+        'tanggal_lahir' => $request->tanggal_lahir,
+        'provinsi' => $request->provinsi,
+        'kabupaten_kota' => $request->kabupaten_kota,
+        'kecamatan' => $request->kecamatan,
+        'kelurahan' => $request->kelurahan,
+        'alamat' => $request->alamat,
+        'no_telp' => $request->no_telp,
+        'pekerjaan' => $request->pekerjaan,
         'is_login' => 'N',
         'is_active' => 'N',
       ]);
 
       $token = $user->createToken("auth_token")->plainTextToken;
 
-      $tokenRecord = DB::table('personal_access_tokens')
-        ->where('tokenable_id', $user->id)
-        ->first();
+      // $tokenRecord = DB::table('personal_access_tokens')
+      //   ->where('tokenable_id', $user->id)
+      //   ->first();
 
-      if (!$tokenRecord) {
-        return response()->json(['success' => false, 'message' => 'Token tidak ditemukan.']);
-      }
+      // if (!$tokenRecord) {
+      //   return response()->json(['success' => false, 'message' => 'Token tidak ditemukan.']);
+      // }
 
-      $tokenNew = $tokenRecord->token;
+      // $tokenNew = $tokenRecord->token;
 
-      $data = [
-        'user' => $user,
-        'token' => $tokenNew,
-      ];
+      // $data = [
+      //   'user' => $user,
+      //   'token' => $tokenNew,
+      // ];
 
-      Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
-        $message->to($data['user']->email)
-          ->subject('Aktivasi Akun');
-      });
+      // Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
+      //   $message->to($data['user']->email)
+      //     ->subject('Aktivasi Akun');
+      // });
 
       return response()->json([
         "success" => true,
