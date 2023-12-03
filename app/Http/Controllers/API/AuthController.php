@@ -255,29 +255,60 @@ class AuthController extends Controller
     }
   }
 
-  public function activateAccount($token)
+  // public function activateAccount($token)
+  // {
+  //   try {
+  //     $personalAccessToken = DB::table('personal_access_tokens')
+  //       ->where('token', $token)
+  //       ->first();
+
+  //     if (!$personalAccessToken) {
+  //       return response()->json(['message' => 'Token aktivasi tidak valid.'], 404);
+  //     }
+
+  //     $user = DB::table('user')
+  //       ->where('id', $personalAccessToken->tokenable_id)
+  //       ->first();
+
+  //     if (!$user) {
+  //       return response()->json(['message' => 'User tidak ditemukan.'], 404);
+  //     }
+
+  //     // Update status aktivasi menjadi 'Y'
+  //     DB::table('user')
+  //       ->where('id', $user->id)
+  //       ->update(['is_active' => 'Y']);
+
+  //     return response()->json(['message' => 'Akun berhasil diaktifkan.'], 200);
+  //   } catch (\Exception $e) {
+  //     return response()->json(['success' => false, 'message' => $e->getMessage()]);
+  //   }
+  // }
+
+  public function activateAccount($userId)
   {
+    if (auth()->user()->role->nama !== 'Admin Dinas') {
+      return response()->json(['message' => 'Akses ditolak'], 403);
+    }
+
     try {
-      $personalAccessToken = DB::table('personal_access_tokens')
-        ->where('token', $token)
-        ->first();
-
-      if (!$personalAccessToken) {
-        return response()->json(['message' => 'Token aktivasi tidak valid.'], 404);
-      }
-
-      $user = DB::table('user')
-        ->where('id', $personalAccessToken->tokenable_id)
-        ->first();
+      $user = User::find($userId);
 
       if (!$user) {
-        return response()->json(['message' => 'User tidak ditemukan.'], 404);
+        return response()->json(['message' => 'User tidak ditemukan'], 404);
       }
 
-      // Update status aktivasi menjadi 'Y'
-      DB::table('user')
-        ->where('id', $user->id)
-        ->update(['is_active' => 'Y']);
+      $user->is_active = 'Y';
+      $user->save();
+
+      $data = [
+        'user' => $user,
+      ];
+
+      Mail::send('emails.aktivasi-akun', ['data' => $data], function ($message) use ($data) {
+        $message->to($data['user']->email)
+          ->subject('Aktivasi Akun');
+      });
 
       return response()->json(['message' => 'Akun berhasil diaktifkan.'], 200);
     } catch (\Exception $e) {
