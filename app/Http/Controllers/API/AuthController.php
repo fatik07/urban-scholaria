@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notifikasi;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\UserNotifikasi;
@@ -24,20 +25,20 @@ class AuthController extends Controller
         "email" => "required|string|max:255|unique:user",
         "password" => "required|string|min:8",
         "nama_lengkap" => "required|string|max:255",
-        "foto" => "nullable|mimes:jpeg,png,jpg",
-        "ktp" => "nullable|mimes:jpeg,png,jpg",
-        "jenis_identitas" => "nullable|in:KTP,Paspor",
-        "nomor_identitas" => "nullable|string|max:100|unique:user,nomor_identitas",
-        "jenis_kelamin" => "nullable|in:Laki-Laki,Perempuan",
-        "tempat_lahir" => "nullable|string|max:100",
-        "tanggal_lahir" => "nullable|date",
-        "provinsi" => "nullable|string|max:100",
-        "kabupaten_kota" => "nullable|string|max:100",
-        "kecamatan" => "nullable|string|max:100",
-        "kelurahan" => "nullable|string|max:100",
-        "alamat" => "nullable|string",
-        "no_telp" => "nullable|string|max:100|unique:user,no_telp",
-        "pekerjaan" => "nullable|string|max:100",
+        "foto" => "required|image|max:5120",
+        "ktp" => "required|image|max:5120",
+        "jenis_identitas" => "required|in:KTP,Paspor",
+        "nomor_identitas" => "required|numeric|size:16|unique:user,nomor_identitas",
+        "jenis_kelamin" => "required|in:Laki-Laki,Perempuan",
+        "tempat_lahir" => "required|string|max:100",
+        "tanggal_lahir" => "required|date",
+        "provinsi" => "required|string|max:100",
+        "kabupaten_kota" => "required|string|max:100",
+        "kecamatan" => "required|string|max:100",
+        "kelurahan" => "required|string|max:100",
+        "alamat" => "required|string",
+        "no_telp" => "required|numeric|max:100|unique:user,no_telp",
+        "pekerjaan" => "required|string|max:100",
         "is_login" => "nullable|in:Y,N",
         "is_active" => "nullable|in:Y,N",
       ]);
@@ -49,7 +50,7 @@ class AuthController extends Controller
       //foto
       if ($request->hasFile('foto')) {
         $fotoUpload = $request->file('foto');
-        $pathFoto = $fotoUpload->storeAs("public/foto-profile", $fotoUpload->getClientOriginalName());
+        $pathFoto = $fotoUpload->storeAs("uploads/foto-profile", $fotoUpload->getClientOriginalName());
       } else {
         $pathFoto = null;
       }
@@ -57,7 +58,7 @@ class AuthController extends Controller
       //ktp
       if ($request->hasFile('ktp')) {
         $fotoUpload = $request->file('ktp');
-        $pathKtp = $fotoUpload->storeAs("public/foto-ktp", $fotoUpload->getClientOriginalName());
+        $pathKtp = $fotoUpload->storeAs("uploads/foto-ktp", $fotoUpload->getClientOriginalName());
       } else {
         $pathKtp = null;
       }
@@ -87,6 +88,18 @@ class AuthController extends Controller
       ]);
 
       $token = $user->createToken("auth_token")->plainTextToken;
+
+      $adminDinas = User::where('role_id', 2)->first();
+
+      if ($adminDinas) {
+        // Buat notifikasi sementara
+        Notifikasi::create([
+          'user_id' => $adminDinas->id,
+          'judul' => 'Pemberitahuan Aktivasi Akun',
+          'deskripsi' => 'Mohon segera aktivasi akun dari email ' . $user->email . ' agar bisa login.',
+          'is_seen' => 'N'
+        ]);
+      }
 
       // $tokenRecord = DB::table('personal_access_tokens')
       //   ->where('tokenable_id', $user->id)
@@ -155,6 +168,7 @@ class AuthController extends Controller
       return response()->json([
         'success' => true,
         'message' => 'Login berhasil dilakukan',
+        'data' => $user,
         'access_token' => $token
       ]);
     } catch (\Exception $e) {
@@ -202,9 +216,10 @@ class AuthController extends Controller
         'email' => 'string|nullable|email|max:255|unique:user,email,' . $user->id,
         'password' => 'nullable|string|min:8',
         'nama_lengkap' => 'string|max:255|nullable',
-        "foto" => "nullable|mimes:jpeg,png,jpg",
+        "foto" => "nullable|image|max:5120",
+        "ktp" => "nullable|image|max:5120",
         'jenis_identitas' => 'nullable|in:KTP,Paspor',
-        'nomor_identitas' => 'nullable|string|max:100|unique:user,nomor_identitas,' . $user->id,
+        'nomor_identitas' => 'nullable|numeric|size:16|unique:user,nomor_identitas,' . $user->id,
         'jenis_kelamin' => 'nullable|in:Laki-Laki,Perempuan',
         'tempat_lahir' => 'nullable|string|max:100',
         'tanggal_lahir' => 'nullable|date',
@@ -213,7 +228,7 @@ class AuthController extends Controller
         'kecamatan' => 'nullable|string|max:100',
         'kelurahan' => 'nullable|string|max:100',
         'alamat' => 'nullable|string',
-        'no_telp' => 'nullable|string|max:100|unique:user,no_telp,' . $user->id,
+        'no_telp' => 'nullable|numeric|max:100|unique:user,no_telp,' . $user->id,
         'pekerjaan' => 'nullable|string|max:100',
         'is_login' => 'nullable|in:Y,N',
         'is_active' => 'nullable|in:Y,N'
@@ -226,22 +241,35 @@ class AuthController extends Controller
       // foto
       if ($request->hasFile('foto')) {
         if ($user->foto) {
-          Storage::delete("public/foto-profile/" . basename($user->foto));
+          Storage::delete("uploads/foto-profile/" . basename($user->foto));
         }
 
         $fotoUpload = $request->file('foto');
-        $pathFoto = $fotoUpload->storeAs("public/foto-profile", $fotoUpload->getClientOriginalName());
+        $pathFoto = $fotoUpload->storeAs("uploads/foto-profile", $fotoUpload->getClientOriginalName());
       } else {
         $pathFoto = $user->foto;
       }
 
+      // ktp
+      if ($request->hasFile('ktp')) {
+        if ($user->foto) {
+          Storage::delete("uploads/foto-profile/" . basename($user->foto));
+        }
+
+        $ktpUpload = $request->file('foto');
+        $pathKtp = $ktpUpload->storeAs("uploads/foto-profile", $ktpUpload->getClientOriginalName());
+      } else {
+        $pathKtp = $user->foto;
+      }
+
       $dataToUpdate = $request->only([
-        "role_id", "username", "email", "password", "nama_lengkap", "foto", "jenis_identitas",
+        "role_id", "username", "email", "password", "nama_lengkap", "foto", "ktp", "jenis_identitas",
         "nomor_identitas", "jenis_kelamin", "tempat_lahir", "tanggal_lahir",
         "provinsi", "kabupaten_kota", "kecamatan", "kelurahan", "alamat",
         "no_telp", "pekerjaan", "is_login", "is_active"
       ]);
       $dataToUpdate['foto'] = $pathFoto;
+      $dataToUpdate['ktp'] = $pathKtp;
 
       if (!empty($dataToUpdate['password'])) {
         $dataToUpdate['password'] = Hash::make($dataToUpdate['password']);

@@ -21,6 +21,7 @@ class User extends Authenticatable
     'password',
     'nama_lengkap',
     'foto',
+    'ktp',
     'jenis_identitas',
     'nomor_identitas',
     'jenis_kelamin',
