@@ -36,19 +36,24 @@ class SuratDokumenController extends Controller
       $validator = Validator::make($request->all(), [
         "surat_id" => "required|exists:surat,id",
         "surat_syarat_id" => "required|exists:surat_syarat,id",
-        "dokumen_upload" => "required|mimes:pdf,doc,docx"
+        "dokumen_upload" => "required|mimes:pdf,doc,docx,png,jpg,jpeg"
       ]);
 
       if ($validator->fails()) {
         return response()->json($validator->errors());
       };
 
-      $dokumenUpload = $request->file('dokumen_upload')->storeAs("public/documents/surat-dokumen/dokumen-upload", $request->file('dokumen_upload')->getClientOriginalName());
+      if ($request->hasFile('dokumen_upload')) {
+        $dokumenUpload = $request->file('dokumen_upload');
+        $dokumenUploadPath = $dokumenUpload->storeAs("uploads/document/surat-dokumen/dokumen-upload", $dokumenUpload->getClientOriginalName());
+      } else {
+        $dokumenUploadPath = null;
+      }
 
       $suratDokumen = SuratDokumen::create([
         "surat_id" => $request->surat_id,
         "surat_syarat_id" => $request->surat_syarat_id,
-        "dokumen_upload" => $dokumenUpload
+        "dokumen_upload" => $dokumenUploadPath
       ]);
 
       return response()->json([
@@ -99,7 +104,7 @@ class SuratDokumenController extends Controller
       $validator = Validator::make($request->all(), [
         "surat_id" => "nullable|exists:surat,id",
         "surat_syarat_id" => "nullable|exists:surat_syarat,id",
-        "dokumen_upload" => "nullable|mimes:pdf,doc,docx"
+        "dokumen_upload" => "nullable|mimes:pdf,doc,docx,png,jpg,jpeg"
       ]);
 
       if ($validator->fails()) {
