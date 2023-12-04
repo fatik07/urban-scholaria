@@ -23,24 +23,24 @@ class AuthController extends Controller
   {
     try {
       $validator = Validator::make($request->all(), [
-        "username" => "required|string|max:255",
-        "email" => "required|string|max:255|unique:user",
+        // "username" => "required|string|max:255",
+        "email" => "required|email|unique:user,email",
         "password" => "required|string|min:8",
-        "nama_lengkap" => "required|string|max:255",
-        "foto" => "required|mimes:jpg,jpeg,png,gif",
-        "ktp" => "required|mimes:jpg,jpeg,png,gif",
-        "jenis_identitas" => "required|in:KTP,Paspor",
-        "nomor_identitas" => "required|numeric|regex:/^(\d{16})$/|unique:user,nomor_identitas",
-        "jenis_kelamin" => "required|in:Laki-Laki,Perempuan",
-        "tempat_lahir" => "required|string|max:100",
-        "tanggal_lahir" => "required|date",
-        "provinsi" => "required|string|max:100",
-        "kabupaten_kota" => "required|string|max:100",
-        "kecamatan" => "required|string|max:100",
-        "kelurahan" => "required|string|max:100",
-        "alamat" => "required|string",
-        "no_telp" => "required|numeric|regex:/^\d{11,13}$/|unique:user,no_telp",
-        "pekerjaan" => "required|string|max:100",
+        "nama_lengkap" => "nullable|string|max:255",
+        "foto" => "nullable|mimes:jpg,jpeg,png,gif",
+        "ktp_paspor" => "nullable|mimes:jpg,jpeg,png,gif",
+        "jenis_identitas" => "nullable|in:KTP,Paspor",
+        "nomor_identitas" => "nullable|numeric|regex:/^(\d{16})$/|unique:user,nomor_identitas",
+        "jenis_kelamin" => "nullable|in:Laki-Laki,Perempuan",
+        "tempat_lahir" => "nullable|string|max:100",
+        "tanggal_lahir" => "nullable|date",
+        "provinsi" => "nullable|string|max:100",
+        "kabupaten_kota" => "nullable|string|max:100",
+        "kecamatan" => "nullable|string|max:100",
+        "kelurahan" => "nullable|string|max:100",
+        "alamat" => "nullable|string",
+        "no_telp" => "nullable|numeric|regex:/^\d{11,13}$/|unique:user,no_telp",
+        "pekerjaan" => "nullable|string|max:100",
         "is_login" => "nullable|in:Y,N",
         "is_active" => "nullable|in:Y,N",
       ]);
@@ -57,22 +57,22 @@ class AuthController extends Controller
         $pathFoto = null;
       }
 
-      //ktp
-      if ($request->hasFile('ktp')) {
-        $fotoUpload = $request->file('ktp');
-        $pathKtp = $fotoUpload->storeAs("uploads/foto-ktp", $fotoUpload->getClientOriginalName());
+      //ktp_paspor
+      if ($request->hasFile('ktp_paspor')) {
+        $ktpPasporUpload = $request->file('ktp_paspor');
+        $pathKtpPaspor = $ktpPasporUpload->storeAs("uploads/foto-ktp-paspor", $ktpPasporUpload->getClientOriginalName());
       } else {
-        $pathKtp = null;
+        $pathKtpPaspor = null;
       }
 
       $user = User::create([
         'role_id' => 9,
-        'username' => $request->username,
+        // 'username' => $request->username,
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'nama_lengkap' => $request->nama_lengkap,
         'foto' => $pathFoto,
-        'ktp' => $pathKtp,
+        'ktp_paspor' => $pathKtpPaspor,
         'jenis_identitas' => $request->jenis_identitas,
         'nomor_identitas' => $request->nomor_identitas,
         'jenis_kelamin' => $request->jenis_kelamin,
@@ -146,7 +146,7 @@ class AuthController extends Controller
         ], 401);
       }
 
-      $user = User::where('email', $request->email)->firstOrFail();
+      $user = User::with('role')->where('email', $request->email)->firstOrFail();
 
       if ($user->is_active === 'N') {
         return response()->json(['message' => 'Akun Anda belum diverify, segera cek email anda.'], 401);
@@ -215,11 +215,11 @@ class AuthController extends Controller
       $validator = Validator::make($request->all(), [
         "role_id" => "nullable|exists:role,id",
         'username' => 'string|max:255|nullable',
-        'email' => 'string|nullable|email|max:255|unique:user,email,' . $user->id,
+        'email' => 'string|nullable|email|unique:user,email,' . $user->id,
         'password' => 'nullable|string|min:8',
         'nama_lengkap' => 'string|max:255|nullable',
         "foto" => "nullable|mimes:jpg,jpeg,png,gif",
-        "ktp" => "nullable|mimes:jpg,jpeg,png,gif",
+        "ktp_paspor" => "nullable|mimes:jpg,jpeg,png,gif",
         'jenis_identitas' => 'nullable|in:KTP,Paspor',
         'nomor_identitas' => 'nullable|numeric|regex:/^(\d{16})$/|unique:user,nomor_identitas,' . $user->id,
         'jenis_kelamin' => 'nullable|in:Laki-Laki,Perempuan',
@@ -253,25 +253,25 @@ class AuthController extends Controller
       }
 
       // ktp
-      if ($request->hasFile('ktp')) {
-        if ($user->ktp) {
-          Storage::delete("uploads/foto-ktp/" . basename($user->ktp));
+      if ($request->hasFile('ktp_paspor')) {
+        if ($user->ktp_paspor) {
+          Storage::delete("uploads/foto-ktp-paspor/" . basename($user->ktp_paspor));
         }
 
-        $ktpUpload = $request->file('ktp');
-        $pathKtp = $ktpUpload->storeAs("uploads/foto-ktp", $ktpUpload->getClientOriginalName());
+        $ktpPasporUpload = $request->file('ktp_paspor');
+        $pathKtpPaspor = $ktpPasporUpload->storeAs("uploads/foto-ktp-paspor", $ktpPasporUpload->getClientOriginalName());
       } else {
-        $pathKtp = $user->ktp;
+        $pathKtpPaspor = $user->ktp;
       }
 
       $dataToUpdate = $request->only([
-        "role_id", "username", "email", "password", "nama_lengkap", "foto", "ktp", "jenis_identitas",
+        "role_id", "email", "username", "password", "nama_lengkap", "foto", "ktp_paspor", "jenis_identitas",
         "nomor_identitas", "jenis_kelamin", "tempat_lahir", "tanggal_lahir",
         "provinsi", "kabupaten_kota", "kecamatan", "kelurahan", "alamat",
         "no_telp", "pekerjaan", "is_login", "is_active"
       ]);
       $dataToUpdate['foto'] = $pathFoto;
-      $dataToUpdate['ktp'] = $pathKtp;
+      $dataToUpdate['ktp_paspor'] = $pathKtpPaspor;
 
       if (!empty($dataToUpdate['password'])) {
         $dataToUpdate['password'] = Hash::make($dataToUpdate['password']);
