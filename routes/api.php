@@ -109,11 +109,11 @@ Route::controller(SuratJenisController::class)->group(function () {
 
 Route::controller(SuratDokumenController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
-    Route::get("surat-jenis", "index");
-    Route::post("surat-jenis", "create");
-    Route::get("surat-jenis/{id}", "show");
-    Route::patch("surat-jenis/{id}", "update");
-    Route::delete("surat-jenis/{id}", "destroy");
+    Route::get("surat-dokumen", "index");
+    Route::post("surat-dokumen", "create");
+    Route::get("surat-dokumen/{id}", "show");
+    Route::patch("surat-dokumen/{id}", "update");
+    Route::delete("surat-dokumen/{id}", "destroy");
   });
 });
 
