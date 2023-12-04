@@ -11,7 +11,7 @@ class SuratJenis extends Model
 
   public $table = 'surat_jenis';
 
-  protected $fillable = ['nama', 'gambar_alur_permohonan', 'gambar_service_level_aggreement'];
+  protected $fillable = ['nama', 'deskripsi', 'gambar_alur_permohonan', 'gambar_service_level_aggreement'];
 
   public function suratSyarats()
   {

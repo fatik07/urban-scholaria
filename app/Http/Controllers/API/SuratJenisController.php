@@ -35,6 +35,7 @@ class SuratJenisController extends Controller
     try {
       $validator = Validator::make($request->all(), [
         "nama" => "required|string|max:255",
+        "deskripsi" => "required|string",
         "gambar_alur_permohonan" => "nullable|mimes:png,jpg,jpeg",
         "gambar_service_level_aggreement" => "nullable|mimes:png,jpg,jpeg"
       ]);
@@ -43,14 +44,27 @@ class SuratJenisController extends Controller
         return response()->json($validator->errors());
       };
 
-      $gambarAlurPermohonan = $request->file('gambar_alur_permohonan')->storeAs("public/documents/surat-jenis/gambar-alur-permohonan", $request->file('gambar_alur_permohonan')->getClientOriginalName());
+      //gambar_alur_permohonan
+      if ($request->hasFile('gambar_alur_permohonan')) {
+        $gambarAlurPermohonan = $request->file('gambar_alur_permohonan');
+        $gambarAlurPermohonanPath = $gambarAlurPermohonan->storeAs("uploads/document/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
+      } else {
+        $gambarAlurPermohonanPath = null;
+      }
 
-      $gambarServiceLevelAgreement = $request->file('gambar_service_level_aggreement')->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $request->file('gambar_service_level_aggreement')->getClientOriginalName());
+      //gambar_service_level_aggreement
+      if ($request->hasFile('gambar_service_level_aggreement')) {
+        $gambarServiceLevelAgreement = $request->file('gambar_service_level_aggreement');
+        $gambarServiceLevelAgreementPath = $gambarServiceLevelAgreement->storeAs("uploads/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAgreement->getClientOriginalName());
+      } else {
+        $gambarServiceLevelAgreementPath = null;
+      }
 
       $suratJenis = SuratJenis::create([
         'nama' => $request->nama,
-        'gambar_alur_permohonan' => $gambarAlurPermohonan,
-        'gambar_service_level_aggreement' => $gambarServiceLevelAgreement
+        'deskripsi' => $request->deskripsi,
+        'gambar_alur_permohonan' => $gambarAlurPermohonanPath,
+        'gambar_service_level_aggreement' => $gambarServiceLevelAgreementPath
       ]);
 
       return response()->json([
@@ -100,6 +114,7 @@ class SuratJenisController extends Controller
 
       $validator = Validator::make($request->all(), [
         "nama" => "nullable|string|max:255",
+        "deskripsi" => "nullable|string",
         "gambar_alur_permohonan" => "nullable|mimes:png,jpg,jpeg",
         "gambar_service_level_aggreement" => "nullable|mimes:png,jpg,jpeg"
       ]);
@@ -110,13 +125,12 @@ class SuratJenisController extends Controller
 
       if ($request->hasFile('gambar_alur_permohonan')) {
         if ($suratJenis->gambar_alur_permohonan) {
-          Storage::delete("public/documents/surat-jenis/gambar-alur-permohonan/" . basename($suratJenis->gambar_alur_permohonan));
+          Storage::delete("uploads/documents/surat-jenis/gambar-alur-permohonan/" . basename($suratJenis->gambar_alur_permohonan));
         }
 
         $gambarAlurPermohonan = $request->file('gambar_alur_permohonan');
-        $path = $gambarAlurPermohonan->storeAs("public/documents/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
-
-        $suratJenis->gambar_alur_permohonan = $path;
+        $gambarAlurPermohonanPath = $gambarAlurPermohonan->storeAs("uploads/documents/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
+        $suratJenis->gambar_alur_permohonan = $gambarAlurPermohonanPath;
       }
 
       if ($request->hasFile('gambar_service_level_aggreement')) {
@@ -125,13 +139,16 @@ class SuratJenisController extends Controller
         }
 
         $gambarServiceLevelAggreement = $request->file('gambar_service_level_aggreement');
-        $path = $gambarServiceLevelAggreement->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
-
-        $suratJenis->gambar_service_level_aggreement = $path;
+        $gambarServiceLevelAggreementPath = $gambarServiceLevelAggreement->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
+        $suratJenis->gambar_service_level_aggreement = $gambarServiceLevelAggreementPath;
       }
 
       if ($request->filled('nama')) {
         $suratJenis->nama = $request->nama;
+      }
+
+      if ($request->filled('deskripsi')) {
+        $suratJenis->deskripsi = $request->deskripsi;
       }
 
       $suratJenis->save();
