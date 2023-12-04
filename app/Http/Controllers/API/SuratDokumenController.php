@@ -113,11 +113,11 @@ class SuratDokumenController extends Controller
 
       if ($request->hasFile('dokumen_upload')) {
         if ($suratDokumen->dokumen_upload) {
-          Storage::delete("public/documents/surat-dokumen/dokumen-upload/" . basename($suratDokumen->dokumen_upload));
+          Storage::delete("uploads/documents/surat-dokumen/dokumen-upload/" . basename($suratDokumen->dokumen_upload));
         }
 
         $dokumenUpload = $request->file('dokumen_upload');
-        $path = $dokumenUpload->storeAs("public/documents/surat-dokumen/dokumen-upload", $dokumenUpload->getClientOriginalName());
+        $path = $dokumenUpload->storeAs("uploads/documents/surat-dokumen/dokumen-upload", $dokumenUpload->getClientOriginalName());
 
         $suratDokumen->dokumen_upload = $path;
       }

@@ -135,11 +135,11 @@ class SuratJenisController extends Controller
 
       if ($request->hasFile('gambar_service_level_aggreement')) {
         if ($suratJenis->gambar_service_level_aggreement) {
-          Storage::delete("public/documents/surat-jenis/gambar-service-level-aggreement/" . basename($suratJenis->gambar_service_level_aggreement));
+          Storage::delete("uploads/documents/surat-jenis/gambar-service-level-aggreement/" . basename($suratJenis->gambar_service_level_aggreement));
         }
 
         $gambarServiceLevelAggreement = $request->file('gambar_service_level_aggreement');
-        $gambarServiceLevelAggreementPath = $gambarServiceLevelAggreement->storeAs("public/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
+        $gambarServiceLevelAggreementPath = $gambarServiceLevelAggreement->storeAs("uploads/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
         $suratJenis->gambar_service_level_aggreement = $gambarServiceLevelAggreementPath;
       }
 

@@ -295,7 +295,7 @@ class SuratController extends Controller
         return response()->json(['message' => 'Surat tidak ditemukan'], 404);
       }
 
-      $dokumenPath = $request->file('dokumen_upload')->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $request->file('dokumen_upload')->getClientOriginalName());
+      $dokumenPath = $request->file('dokumen_upload')->storeAs("uploads/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $request->file('dokumen_upload')->getClientOriginalName());
 
       $suratDokumen = SuratDokumen::create([
         'surat_id' => $suratId,
@@ -342,11 +342,11 @@ class SuratController extends Controller
       if ($request->hasFile('dokumen_upload')) {
         if ($suratDokumen->dokumen_upload) {
           // Storage::delete($suratDokumen->dokumen_upload);
-          Storage::delete("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}/" . basename($suratDokumen->dokumen_upload));
+          Storage::delete("uploads/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}/" . basename($suratDokumen->dokumen_upload));
         }
 
         $dokumenUpload = $request->file('dokumen_upload');
-        $path = $dokumenUpload->storeAs("public/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $dokumenUpload->getClientOriginalName());
+        $path = $dokumenUpload->storeAs("uploads/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $dokumenUpload->getClientOriginalName());
       } else {
         $path = $suratDokumen->dokumen_upload;
       }
@@ -595,11 +595,11 @@ class SuratController extends Controller
       // foto
       if ($request->hasFile('foto_survey')) {
         if ($survey->foto_survey) {
-          Storage::delete("public/documents/survey/foto-survey/" . basename($survey->foto_survey));
+          Storage::delete("uploads/documents/survey/foto-survey/" . basename($survey->foto_survey));
         }
 
         $fotoUpload = $request->file('foto_survey');
-        $pathFoto = $fotoUpload->storeAs("public/documents/survey/foto-survey", $fotoUpload->getClientOriginalName());
+        $pathFoto = $fotoUpload->storeAs("uploads/documents/survey/foto-survey", $fotoUpload->getClientOriginalName());
       } else {
         $pathFoto = $survey->foto_survey;
       }
@@ -607,11 +607,11 @@ class SuratController extends Controller
       // dokumen
       if ($request->hasFile('dokumen_survey')) {
         if ($survey->dokumen_survey) {
-          Storage::delete("public/documents/survey/dokumen-survey/" . basename($survey->dokumen_survey));
+          Storage::delete("uploads/documents/survey/dokumen-survey/" . basename($survey->dokumen_survey));
         }
 
         $dokumenUpload = $request->file('dokumen_survey');
-        $path = $dokumenUpload->storeAs("public/documents/survey/dokumen-survey", $dokumenUpload->getClientOriginalName());
+        $path = $dokumenUpload->storeAs("uploads/documents/survey/dokumen-survey", $dokumenUpload->getClientOriginalName());
       } else {
         $path = $survey->dokumen_survey;
       }
