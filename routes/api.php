@@ -83,7 +83,8 @@ Route::controller(SurveyorController::class)->group(function () {
 
 Route::controller(FeedbackController::class)->group(function () {
   Route::middleware("auth:sanctum")->group(function () {
-    Route::post("feedback-pemohon", "index");
+    Route::get("feedback-pemohon", "index");
+    Route::post("feedback-pemohon", "create");
   });
 });
 

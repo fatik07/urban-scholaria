@@ -10,7 +10,17 @@ use Illuminate\Support\Facades\Validator;
 
 class FeedbackController extends Controller
 {
-  public function index(Request $request)
+  public function index()
+  {
+    try {
+      $feedbacks = Ulasan::with('surat')->get();
+      return response()->json(['success' => true, 'message' => 'Data feedback berhasil diambil', 'data' => $feedbacks]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function create(Request $request)
   {
     try {
       if (auth()->user()->role->nama !== 'Pemohon') {

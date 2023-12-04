@@ -13,8 +13,8 @@ class Ulasan extends Model
 
   protected $fillable = ['surat_id', 'isi'];
 
-  // public function surat()
-  // {
-  //   return $this->belongsTo(Submission::class);
-  // }
+  public function surat()
+  {
+    return $this->belongsTo(Surat::class, 'surat_id');
+  }
 }
