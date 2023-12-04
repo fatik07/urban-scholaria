@@ -10,10 +10,12 @@ use App\Models\UserNotifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -25,8 +27,8 @@ class AuthController extends Controller
         "email" => "required|string|max:255|unique:user",
         "password" => "required|string|min:8",
         "nama_lengkap" => "required|string|max:255",
-        "foto" => "required|mimes:jpg,jpeg,png,gif|size:5120",
-        "ktp" => "required|mimes:jpg,jpeg,png,gif|size:5120",
+        "foto" => "required|mimes:jpg,jpeg,png,gif",
+        "ktp" => "required|mimes:jpg,jpeg,png,gif",
         "jenis_identitas" => "required|in:KTP,Paspor",
         "nomor_identitas" => "required|numeric|regex:/^(\d{16})$/|unique:user,nomor_identitas",
         "jenis_kelamin" => "required|in:Laki-Laki,Perempuan",
@@ -216,8 +218,8 @@ class AuthController extends Controller
         'email' => 'string|nullable|email|max:255|unique:user,email,' . $user->id,
         'password' => 'nullable|string|min:8',
         'nama_lengkap' => 'string|max:255|nullable',
-        "foto" => "nullable|mimes:jpg,jpeg,png,gif|size:5120",
-        "ktp" => "nullable|mimes:jpg,jpeg,png,gif|size:5120",
+        "foto" => "nullable|mimes:jpg,jpeg,png,gif",
+        "ktp" => "nullable|mimes:jpg,jpeg,png,gif",
         'jenis_identitas' => 'nullable|in:KTP,Paspor',
         'nomor_identitas' => 'nullable|numeric|regex:/^(\d{16})$/|unique:user,nomor_identitas,' . $user->id,
         'jenis_kelamin' => 'nullable|in:Laki-Laki,Perempuan',
@@ -238,7 +240,7 @@ class AuthController extends Controller
         return response()->json(['errors' => $validator->errors()], 400);
       }
 
-      // foto
+      //foto
       if ($request->hasFile('foto')) {
         if ($user->foto) {
           Storage::delete("uploads/foto-profile/" . basename($user->foto));
@@ -252,14 +254,14 @@ class AuthController extends Controller
 
       // ktp
       if ($request->hasFile('ktp')) {
-        if ($user->foto) {
-          Storage::delete("uploads/foto-profile/" . basename($user->foto));
+        if ($user->ktp) {
+          Storage::delete("uploads/foto-ktp/" . basename($user->ktp));
         }
 
-        $ktpUpload = $request->file('foto');
-        $pathKtp = $ktpUpload->storeAs("uploads/foto-profile", $ktpUpload->getClientOriginalName());
+        $ktpUpload = $request->file('ktp');
+        $pathKtp = $ktpUpload->storeAs("uploads/foto-ktp", $ktpUpload->getClientOriginalName());
       } else {
-        $pathKtp = $user->foto;
+        $pathKtp = $user->ktp;
       }
 
       $dataToUpdate = $request->only([

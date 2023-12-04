@@ -29,7 +29,7 @@ Route::controller(AuthController::class)->group(function () {
 
   Route::middleware("auth:sanctum")->group(function () {
     Route::get("profile", "getProfile");
-    Route::patch("update-profile", "updateProfile");
+    Route::post("update-profile", "updateProfile");
 
     Route::post("aktivasi-akun/{userId}", "activateAccount");
 
