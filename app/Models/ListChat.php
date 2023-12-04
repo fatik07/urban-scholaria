@@ -9,7 +9,12 @@ class ListChat extends Model
 {
   use HasFactory;
 
-  public $table = 'list_chat';
+  public $table = 'listchat';
 
   protected $fillable = ['roomchat_id', 'account', 'message', 'read'];
+
+  public function roomChat()
+  {
+    return $this->belongsTo(RoomChat::class, 'roomchat_id');
+  }
 }
