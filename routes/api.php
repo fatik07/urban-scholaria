@@ -49,9 +49,13 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::controller(ResetPasswordController::class)->group(function () {
-  Route::post("send-reset-link", "sendResetLink");
-  Route::get("reset-password/{token}", "showResetForm")->name('reset-password.show');
-  Route::post("reset-password/{token}", "sendResetPassword")->name('reset-password.send');
+  // Route::post("send-reset-link", "sendResetLink");
+  // Route::get("reset-password/{token}", "showResetForm")->name('reset-password.show');
+  // Route::post("reset-password/{token}", "sendResetPassword")->name('reset-password.send');
+  Route::post("send-otp", "sendOtp");
+  Route::post("verify-otp", "verifyOtp");
+  Route::get("send-otp-again", "sendOtpAgain");
+  Route::post("reset-password", "sendResetPassword");
 });
 
 Route::controller(SuratController::class)->group(function () {
