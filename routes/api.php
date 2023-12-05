@@ -34,9 +34,13 @@ Route::controller(AuthController::class)->group(function () {
 
     Route::post("aktivasi-akun/{userId}", "activateAccount");
 
+    Route::post("tolak-aktivasi-akun/{userId}", "activateAccountReject");
+
     Route::post("logout", "logout");
 
     Route::get("users", "users");
+
+    Route::get("user/{userId}", "detailUser");
 
     Route::get("roles", "roles");
 

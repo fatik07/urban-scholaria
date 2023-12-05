@@ -346,6 +346,43 @@ class AuthController extends Controller
     }
   }
 
+  public function activateAccountReject(Request $request, $userId)
+  {
+    if (auth()->user()->role->nama !== 'Admin Dinas') {
+      return response()->json(['message' => 'Akses ditolak'], 403);
+    }
+
+    try {
+      $user = User::find($userId);
+
+      if (!$user) {
+        return response()->json(['message' => 'User tidak ditemukan'], 404);
+      }
+
+      $reason = $request->input('alasan_ditolak');
+
+      if (!$reason) {
+        return response()->json(['message' => 'Alasan penolakan harus disertakan'], 400);
+      }
+
+      $data = [
+        'user' => $user,
+        'reason' => $reason,
+      ];
+
+      Mail::send('emails.tolak-aktivasi-akun', ['data' => $data], function ($message) use ($data) {
+        $message->to($data['user']->email)
+          ->subject('Aktivasi Akun Ditolak');
+      });
+
+      $user->delete();
+
+      return response()->json(['message' => 'Mohon maaf akun anda gagal diaktivasi.'], 200);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
   public function users(Request $request)
   {
     try {
@@ -374,6 +411,25 @@ class AuthController extends Controller
       $users = $query->get();
 
       return response()->json(['success' => true, 'message' => $message, 'data' => $users]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function detailUser($userId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Admin Dinas') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $user = User::with('role')->find($userId);
+
+      if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+      }
+
+      return response()->json(['success' => true, 'message' => 'Detail user', 'data' => $user]);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }

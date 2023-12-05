@@ -144,7 +144,7 @@
 
   <div class="container">
     <div class="content">
-      <h3>Halo {{ $data['user']->username }}!</h3>
+      <h3>Halo {{ $data['user']->nama_lengkap }}!</h3>
       <p>
         Kami senang memberitahu Anda bahwa akun Anda di Urban Scholaria telah berhasil diaktivasi oleh admin. Anda
         sekarang dapat mengakses seluruh fitur dan layanan kami.
