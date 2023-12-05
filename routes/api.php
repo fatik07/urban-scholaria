@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\FeedbackController;
 use App\Http\Controllers\API\PdfController;
+use App\Http\Controllers\API\ResetPasswordController;
 use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratDokumenController;
 use App\Http\Controllers\API\SuratJenisController;
@@ -41,6 +42,12 @@ Route::controller(AuthController::class)->group(function () {
 
     Route::get("set-role/{user}", "setRole");
   });
+});
+
+Route::controller(ResetPasswordController::class)->group(function () {
+  Route::post("send-reset-link", "sendResetLink");
+  Route::get("reset-password/{token}", "showResetForm")->name('reset-password.show');
+  Route::post("reset-password/{token}", "sendResetPassword")->name('reset-password.send');
 });
 
 Route::controller(SuratController::class)->group(function () {
