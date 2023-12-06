@@ -14,11 +14,26 @@ class SuratSyaratController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
+  public function index(Request $request)
   {
     try {
-      $suratSyarat = SuratSyarat::all();
-      return response()->json(['success' => true, 'message' => 'Semua surat syarat berhasil didapatkan', 'data' => $suratSyarat]);
+      $surat_jenis = $request->query('surat_jenis_id');
+
+      $query = SuratSyarat::query();
+      $message = "Surat syarat berhasil didapatkan";
+
+      if ($surat_jenis) {
+        $query->where('surat_jenis_id', $surat_jenis);
+        $message .= " dengan surat jenis id " . $surat_jenis;
+      }
+
+      $suratSyarat = $query->get();
+
+      if ($suratSyarat->isEmpty()) {
+        return response()->json(['success' => false, 'message' => 'Maaf, tidak ada surat syarat yang sesuai']);
+      }
+
+      return response()->json(['success' => true, 'message' => $message, 'data' => $suratSyarat]);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
