@@ -47,7 +47,7 @@ class SuratJenisController extends Controller
       //gambar_alur_permohonan
       if ($request->hasFile('gambar_alur_permohonan')) {
         $gambarAlurPermohonan = $request->file('gambar_alur_permohonan');
-        $gambarAlurPermohonanPath = $gambarAlurPermohonan->storeAs("uploads/document/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
+        $gambarAlurPermohonanPath = $gambarAlurPermohonan->storeAs("uploads/documents/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
       } else {
         $gambarAlurPermohonanPath = null;
       }
