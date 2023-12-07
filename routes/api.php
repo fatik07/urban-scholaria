@@ -104,22 +104,20 @@ Route::controller(FeedbackController::class)->group(function () {
 });
 
 // Route::controller(ChatController::class)->group(function () {
-//   // Route::middleware("auth:sanctum")->group(function () {
-//   Route::get("chat/room-chats", "getRoomChats");
-//   Route::get("chat/list-chats", "getListChats");
-//   Route::post("chat/send-message", "sendMessage");
-//   Route::get("chat/{roomchat_id}", "showChat");
-//   // });
+//   Route::middleware("auth:sanctum")->group(function () {
+//     Route::post('start-chat',  'startChat');
+//     Route::post('send-message/{room_id}',  'sendMessage');
+//     Route::get('get-chat-list',  'getChatList');
+//     Route::get('get-chat-room/{room_id}',  'getChatRoom');
+//   });
 // });
 
 Route::controller(SuratJenisController::class)->group(function () {
-  Route::middleware("auth:sanctum")->group(function () {
-    Route::get("surat-jenis", "index");
-    Route::post("surat-jenis", "create");
-    Route::get("surat-jenis/{id}", "show");
-    Route::patch("surat-jenis/{id}", "update");
-    Route::delete("surat-jenis/{id}", "destroy");
-  });
+  Route::get("surat-jenis", "index");
+  Route::post("surat-jenis", "create");
+  Route::get("surat-jenis/{id}", "show");
+  Route::patch("surat-jenis/{id}", "update");
+  Route::delete("surat-jenis/{id}", "destroy");
 });
 
 Route::controller(SuratDokumenController::class)->group(function () {
@@ -133,13 +131,11 @@ Route::controller(SuratDokumenController::class)->group(function () {
 });
 
 Route::controller(SuratSyaratController::class)->group(function () {
-  Route::middleware("auth:sanctum")->group(function () {
-    Route::get("surat-syarat", "index");
-    Route::post("surat-syarat", "create");
-    Route::get("surat-syarat/{id}", "show");
-    Route::patch("surat-syarat/{id}", "update");
-    Route::delete("surat-syarat/{id}", "destroy");
-  });
+  Route::get("surat-syarat", "index");
+  Route::post("surat-syarat", "create");
+  Route::get("surat-syarat/{id}", "show");
+  Route::patch("surat-syarat/{id}", "update");
+  Route::delete("surat-syarat/{id}", "destroy");
 });
 
 Route::controller(PdfController::class)->group(function () {
