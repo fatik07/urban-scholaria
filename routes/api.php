@@ -103,14 +103,14 @@ Route::controller(FeedbackController::class)->group(function () {
   });
 });
 
-// Route::controller(ChatController::class)->group(function () {
-//   Route::middleware("auth:sanctum")->group(function () {
-//     Route::post('start-chat',  'startChat');
-//     Route::post('send-message/{room_id}',  'sendMessage');
-//     Route::get('get-chat-list',  'getChatList');
-//     Route::get('get-chat-room/{room_id}',  'getChatRoom');
-//   });
-// });
+Route::controller(ChatController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::post('start-chat',  'startChat');
+    Route::post('send-message/{room_id}',  'sendMessage');
+    Route::get('get-chat-list',  'getChatList');
+    Route::get('get-chat-room/{room_id}',  'getChatRoom');
+  });
+});
 
 Route::controller(SuratJenisController::class)->group(function () {
   Route::get("surat-jenis", "index");
