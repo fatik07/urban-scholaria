@@ -38,6 +38,10 @@ class PdfController extends Controller
     try {
       $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
 
+      if ($surat->status !== 'Selesai') {
+        return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+      }
+
       // Get the SuratDokumen for the specified Surat
       $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
 
@@ -70,6 +74,10 @@ class PdfController extends Controller
   {
     try {
       $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+
+      if ($surat->status !== 'Selesai') {
+        return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+      }
 
       // Get the SuratDokumen for the specified Surat
       $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
