@@ -15,6 +15,10 @@ class PdfController extends Controller
   {
     $surat = SuratDokumen::where('surat_id', $surat_id)->first();
 
+    if (!$surat) {
+      return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan']);
+    }
+
     $nomor_surat = $surat->surat->id;
 
     $url = url("/api/surat?id_surat={$nomor_surat}");
