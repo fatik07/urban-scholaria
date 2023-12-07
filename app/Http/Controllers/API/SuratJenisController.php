@@ -177,11 +177,11 @@ class SuratJenisController extends Controller
         return response()->json(['message' => 'Surat jenis tidak ditemukan'], 404);
       }
 
-      if (Storage::exists($gambarAlurPermohonan)) {
+      if (!is_null($gambarAlurPermohonan) && Storage::exists($gambarAlurPermohonan)) {
         Storage::delete($gambarAlurPermohonan);
       }
 
-      if (Storage::exists($gambarServiceLevelAggreement)) {
+      if (!is_null($gambarServiceLevelAggreement) && Storage::exists($gambarServiceLevelAggreement)) {
         Storage::delete($gambarServiceLevelAggreement);
       }
 
