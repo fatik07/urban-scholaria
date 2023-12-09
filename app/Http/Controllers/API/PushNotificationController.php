@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Notifikasi;
+use Auth;
 use Illuminate\Http\Request;
 
 class PushNotificationController extends Controller
@@ -51,5 +52,34 @@ class PushNotificationController extends Controller
       'deskripsi' => $message,
       'is_seen' => 'N'
     ]);
+  }
+
+  public function index(Request $request)
+  {
+    try {
+      $user_id = Auth::user()->id;
+      $notifikasi = Notifikasi::where('user_id', $user_id)->get();
+
+      return response()->json(['success' => true, 'data' => $notifikasi]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function markAsSeen(Request $request, $id)
+  {
+    try {
+      $notifikasi = Notifikasi::findOrFail($id);
+
+      if (!$notifikasi) {
+        return response()->json(['success' => false, 'message' => 'Notifikasi tidak ditemukan']);
+      }
+
+      $notifikasi->update(['is_seen' => 'Y']);
+
+      return response()->json(['success' => true, 'message' => 'Notifikasi telah ditandai sebagai sudah dilihat', 'data' => $notifikasi]);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
   }
 }

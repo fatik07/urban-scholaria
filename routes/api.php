@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\FeedbackController;
 use App\Http\Controllers\API\PdfController;
+use App\Http\Controllers\API\PushNotificationController;
 use App\Http\Controllers\API\ResetPasswordController;
 use App\Http\Controllers\API\SuratController;
 use App\Http\Controllers\API\SuratDokumenController;
@@ -143,5 +144,12 @@ Route::controller(PdfController::class)->group(function () {
     Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
     Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
     Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
+  });
+});
+
+Route::controller(PushNotificationController::class)->group(function () {
+  Route::middleware("auth:sanctum")->group(function () {
+    Route::get('notifikasi', 'index');
+    Route::get('notifikasi/{id}/mark-as-seen', 'markAsSeen');
   });
 });
