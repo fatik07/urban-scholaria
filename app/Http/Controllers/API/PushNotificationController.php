@@ -60,7 +60,11 @@ class PushNotificationController extends Controller
       $user_id = Auth::user()->id;
       $notifikasi = Notifikasi::where('user_id', $user_id)->get();
 
-      return response()->json(['success' => true, 'data' => $notifikasi]);
+      if ($notifikasi->isEmpty()) {
+        return response()->json(['success' => true, 'message' => 'Tidak ada notifikasi.', 'data' => null]);
+      }
+
+      return response()->json(['success' => true, 'message' => 'Berhasil mendapatkan semua notifikasi sesuai dengan user yang sedang login', 'data' => $notifikasi]);
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
