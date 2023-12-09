@@ -37,7 +37,12 @@ class SuratController extends Controller
           $message = "Surat berhasil didapatkan";
 
           if ($suratId) {
-            $query->where('id', $suratId);
+            // $query->where('id', $suratId);
+            $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
+              ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
+              ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
+              ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
+              ->where('surat.id', $suratId);
             $message .= " dengan id " . $suratId;
           }
 
@@ -92,7 +97,12 @@ class SuratController extends Controller
         }
 
         if ($suratId) {
-          $query->where('id', $suratId);
+          // $query->where('id', $suratId);
+          $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
+            ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
+            ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
+            ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
+            ->where('surat.id', $suratId);
           $message .= " dengan id " . $suratId;
         }
 
@@ -291,8 +301,9 @@ class SuratController extends Controller
       $suratJenis = SuratJenis::find($suratJenisId);
       $suratSyarat = SuratSyarat::find($suratSyaratId);
 
-      if (!$surat) {
-        return response()->json(['message' => 'Surat tidak ditemukan'], 404);
+      // cek
+      if (!$surat || !$suratJenis || !$suratSyarat) {
+        return response()->json(['message' => 'Surat, surat jenis, atau surat syarat tidak ditemukan'], 404);
       }
 
       $dokumenPath = $request->file('dokumen_upload')->storeAs("uploads/documents/surat-dokumen/dokumen-upload/{$suratJenis->nama}/{$suratSyarat->nama}", $request->file('dokumen_upload')->getClientOriginalName());
@@ -363,7 +374,7 @@ class SuratController extends Controller
     }
   }
 
-  public function suratDiajukan($suratId)
+  public function suratDiajukan(Request $request, $suratId)
   {
     try {
       if (auth()->user()->role->nama !== 'Pemohon') {
@@ -371,6 +382,14 @@ class SuratController extends Controller
       }
 
       $surat = Surat::findOrFail($suratId);
+
+      // cek validate dokumen
+      $cekJumlahSuratSyarat = SuratSyarat::where('surat_jenis_id', $request->surat_jenis_id)->count();
+      $cekJumlahSuratDokumen = SuratDokumen::where('surat_id', $suratId)->count();
+
+      if ($cekJumlahSuratDokumen < $cekJumlahSuratSyarat) {
+        return response()->json(['message' => 'Surat dokumen belum lengkap, mohon dilengkapi terlebih dahulu'], 404);
+      }
 
       if ($surat->status === 'Pengisian Dokumen') {
         $surat->status = 'Verifikasi Operator';
