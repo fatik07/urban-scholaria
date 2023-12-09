@@ -17,7 +17,7 @@ class FeedbackController extends Controller
       $feedbacks = Ulasan::with('surat')
         ->join('surat', 'ulasan.surat_id', '=', 'surat.id')
         ->join('user', 'surat.user_id', '=', 'user.id')
-        ->select('ulasan.*', 'surat.nama as nama_surat', 'user.nomor_identitas as nomor_identitas')
+        ->select('ulasan.*', 'surat.nama as nama_surat', 'user.nama_lengkap as nama_lengkap', 'user.nomor_identitas as nomor_identitas')
         ->get();
       return response()->json(['success' => true, 'message' => 'Data feedback berhasil diambil', 'data' => $feedbacks]);
     } catch (\Exception $e) {
