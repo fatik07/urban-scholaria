@@ -11,11 +11,16 @@ class Surat extends Model
 
   public $table = 'surat';
 
-  protected $fillable = ['user_id', 'nama', 'status', 'is_ulasan', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'jadwal_survey', 'nomor_penerbitan', 'is_dikembalikan', 'is_terlambat', 'alasan_dikembalikan'];
+  protected $fillable = ['user_id', 'surat_jenis_id', 'nama', 'status', 'is_ulasan', 'kategori', 'alamat_lokasi', 'longitude', 'latitude', 'jadwal_survey', 'nomor_penerbitan', 'is_dikembalikan', 'is_terlambat', 'alasan_dikembalikan'];
 
   public function user()
   {
     return $this->belongsTo(User::class, 'user_id');
+  }
+
+  public function suratJenis()
+  {
+    return $this->belongsTo(SuratJenis::class, 'surat_jenis_id');
   }
 
   public function suratDokumen()

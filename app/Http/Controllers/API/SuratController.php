@@ -11,6 +11,7 @@ use App\Models\SuratSyarat;
 use App\Models\Survey;
 use Auth;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -25,90 +26,139 @@ class SuratController extends Controller
   public function index(Request $request)
   {
     try {
-      if (auth()->user()->role->nama !== 'Pemohon') {
-        $suratId = $request->query('id_surat');
-        $status = $request->query('status');
-        $nama = $request->query('nama');
-        $kategori = $request->query('kategori');
-        $order = $request->query('order_by');
+      // if (auth()->user()->role->nama !== 'Pemohon') {
+      //   $suratId = $request->query('id_surat');
+      //   $status = $request->query('status');
+      //   $nama = $request->query('nama');
+      //   $kategori = $request->query('kategori');
+      //   $order = $request->query('order_by');
 
-        if ($suratId || $status || $nama || $kategori || $order) {
-          $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
-          $message = "Surat berhasil didapatkan";
+      //   if ($suratId || $status || $nama || $kategori || $order) {
+      //     $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
+      //     $message = "Surat berhasil didapatkan";
 
-          if ($suratId) {
-            // $query->where('id', $suratId);
-            $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
-              ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
-              ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
-              ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
-              ->where('surat.id', $suratId);
-            $message .= " dengan id " . $suratId;
-          }
+      //     if ($suratId) {
+      //       // $query->where('id', $suratId);
+      //       $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
+      //         ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
+      //         ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
+      //         ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
+      //         ->where('surat.id', $suratId);
+      //       $message .= " dengan id " . $suratId;
+      //     }
 
-          if ($status) {
-            $query->where('status', $status);
-            $message .= " dengan status " . $status;
-          }
+      //     if ($status) {
+      //       $query->where('status', $status);
+      //       $message .= " dengan status " . $status;
+      //     }
 
-          if ($nama) {
-            $query->whereHas('suratDokumen.suratSyarat.suratJenis', function ($query) use ($nama) {
-              $query->where('nama', 'like', "%$nama%");
-            });
-            $message .= " dengan nama " . $nama;
-          }
+      //     if ($nama) {
+      //       $query->whereHas('suratDokumen.suratSyarat.suratJenis', function ($query) use ($nama) {
+      //         $query->where('nama', 'like', "%$nama%");
+      //       });
+      //       $message .= " dengan nama " . $nama;
+      //     }
 
-          if ($kategori) {
-            $query->where('kategori', $kategori);
-            $message .= " dengan kategori " . $kategori;
-          }
+      //     if ($kategori) {
+      //       $query->where('kategori', $kategori);
+      //       $message .= " dengan kategori " . $kategori;
+      //     }
 
-          if ($order) {
-            $query->orderBy('created_at', $order);
-            $message .= " dengan order by " . $order;
-          }
+      //     if ($order) {
+      //       $query->orderBy('created_at', $order);
+      //       $message .= " dengan order by " . $order;
+      //     }
 
-          $surat = $query->get();
+      //     $surat = $query->get();
 
-          if ($surat->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'Maaf, nilai parameter tidak sesuai']);
-          }
+      //     if ($surat->isEmpty()) {
+      //       return response()->json(['success' => false, 'message' => 'Maaf, nilai parameter tidak sesuai']);
+      //     }
 
-          return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
-        } else {
-          $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->get();
+      //     return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
+      //   } else {
+      //     $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->get();
 
-          return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
-        }
-      } else {
-        $suratId = $request->query('id_surat');
-        $status = $request->query('status');
-        $nama = $request->query('nama');
-        $kategori = $request->query('kategori');
-        $order = $request->query('order_by', 'asc');
+      //     return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
+      //   }
+      // } else {
+      //   $suratId = $request->query('id_surat');
+      //   $status = $request->query('status');
+      //   $nama = $request->query('nama');
+      //   $kategori = $request->query('kategori');
+      //   $order = $request->query('order_by', 'asc');
 
-        $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
+      //   $query = Surat::with('suratDokumen.suratSyarat.suratJenis');
+      //   $message = "Surat berhasil didapatkan";
+
+      //   if ($status || $nama || $kategori || $order) {
+      //     if (!$suratId) {
+      //       return response()->json(['message' => 'Akses ditolak'], 403);
+      //     }
+      //   }
+
+      //   if ($suratId) {
+      //     // $query->where('id', $suratId);
+      //     $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
+      //       ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
+      //       ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
+      //       ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
+      //       ->where('surat.id', $suratId);
+      //     $message .= " dengan id " . $suratId;
+      //   }
+
+      //   $surat = $query->get();
+
+      //   return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
+      // }
+      $suratId = $request->query('id_surat');
+      $status = $request->query('status');
+      $nama = $request->query('nama');
+      $kategori = $request->query('kategori');
+      $order = $request->query('order_by');
+
+      if ($suratId || $status || $nama || $kategori || $order) {
+        $query = Surat::with('suratJenis', 'user');
         $message = "Surat berhasil didapatkan";
 
-        if ($status || $nama || $kategori || $order) {
-          if (!$suratId) {
-            return response()->json(['message' => 'Akses ditolak'], 403);
-          }
+        if ($suratId) {
+          $query->where('id', $suratId);
+          $message .= " dengan id " . $suratId;
         }
 
-        if ($suratId) {
-          // $query->where('id', $suratId);
-          $query->join('surat_dokumen', 'surat.id', '=', 'surat_dokumen.surat_id')
-            ->join('surat_syarat', 'surat_dokumen.surat_syarat_id', '=', 'surat_syarat.id')
-            ->join('surat_jenis', 'surat_syarat.surat_jenis_id', '=', 'surat_jenis.id')
-            ->select('surat.*', 'surat_jenis.nama as surat_jenis_nama')
-            ->where('surat.id', $suratId);
-          $message .= " dengan id " . $suratId;
+        if ($status) {
+          $query->where('status', $status);
+          $message .= " dengan status " . $status;
+        }
+
+        if ($nama) {
+          $query->whereHas('suratJenis', function ($query) use ($nama) {
+            $query->where('surat_jenis.nama', 'like', "%$nama%");
+          });
+          $message .= " dengan nama " . $nama;
+        }
+
+        if ($kategori) {
+          $query->where('kategori', $kategori);
+          $message .= " dengan kategori " . $kategori;
+        }
+
+        if ($order) {
+          $query->orderBy('created_at', $order);
+          $message .= " dengan order by " . $order;
         }
 
         $surat = $query->get();
 
+        if ($surat->isEmpty()) {
+          return response()->json(['success' => false, 'message' => 'Maaf, nilai parameter tidak sesuai', 'data' => null]);
+        }
+
         return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
+      } else {
+        $surat = Surat::with('suratJenis', 'user')->get();
+
+        return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
       }
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -129,6 +179,7 @@ class SuratController extends Controller
 
       $validator = Validator::make($request->all(), [
         "user_id" => "nullable|exists:user,id",
+        "surat_jenis_id" => "nullable|exists:surat_jenis,id",
         "nama" => "nullable|string|max:255",
         "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
         "is_ulasan" => "nullable|in:Y,N",
@@ -149,6 +200,7 @@ class SuratController extends Controller
 
       $surat = Surat::create([
         "user_id" => Auth::user()->id,
+        "surat_jenis_id" => $request->surat_jenis_id,
         "nama" => $request->nama,
         "status" => 'Pengisian Dokumen',
         "is_ulasan" => 'N',
@@ -251,14 +303,16 @@ class SuratController extends Controller
   public function getSuratByUserId($userId)
   {
     try {
-      if (auth()->user()->role->nama !== 'Pemohon') {
+      if (auth()->user()->id != $userId) {
         return response()->json(['message' => 'Akses ditolak'], 403);
       }
 
-      $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->where('user_id', $userId)->get();
+      $surat = Surat::with('suratJenis', 'user')->where('user_id', $userId)->get();
 
-      if ($surat) {
-        return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan berdasarkan pemohon', 'data' => $surat]);
+      if ($surat->isNotEmpty()) {
+        return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan berdasarkan id user ' . $userId, 'data' => $surat]);
+      } else {
+        return response()->json(['success' => true, 'message' => 'Tidak ada surat yang ditemukan berdasarkan id user ' . $userId, 'data' => []]);
       }
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
