@@ -118,7 +118,7 @@ class SuratController extends Controller
       $order = $request->query('order_by');
 
       if ($suratId || $status || $nama || $kategori || $order) {
-        $query = Surat::with('suratJenis', 'user');
+        $query = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat');
         $message = "Surat berhasil didapatkan";
 
         if ($suratId) {
@@ -156,7 +156,7 @@ class SuratController extends Controller
 
         return response()->json(['success' => true, 'message' => $message, 'data' => $surat]);
       } else {
-        $surat = Surat::with('suratJenis', 'user')->get();
+        $surat = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat')->get();
 
         return response()->json(['success' => true, 'message' => 'Semua surat berhasil didapatkan', 'data' => $surat]);
       }
@@ -307,7 +307,7 @@ class SuratController extends Controller
         return response()->json(['message' => 'Akses ditolak'], 403);
       }
 
-      $surat = Surat::with('suratJenis', 'user')->where('user_id', $userId)->get();
+      $surat = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat')->where('user_id', $userId)->get();
 
       if ($surat->isNotEmpty()) {
         return response()->json(['success' => true, 'message' => 'Surat berhasil didapatkan berdasarkan id user ' . $userId, 'data' => $surat]);
