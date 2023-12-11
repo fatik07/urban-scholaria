@@ -241,37 +241,37 @@ class SuratController extends Controller
         return response()->json(['message' => 'Surat tidak ditemukan'], 404);
       }
 
-      if ($surat->is_dikembalikan === 'Y') {
-        $validator = Validator::make($request->all(), [
-          "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
-          "alamat_lokasi" => "nullable|string|max:255",
-          "longitude" => "nullable|string|max:255",
-          "latitude" => "nullable|string|max:255",
-          "is_dikembalikan" => "nullable|in:Y,N",
-          "is_terlambat" => "nullable|in:Y,N",
-          "alasan_dikembalikan" => "nullable|string|max:255",
-          'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
-        ]);
+      // if ($surat->is_dikembalikan === 'Y') {
+      $validator = Validator::make($request->all(), [
+        "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
+        "alamat_lokasi" => "nullable|string|max:255",
+        "longitude" => "nullable|string|max:255",
+        "latitude" => "nullable|string|max:255",
+        "is_dikembalikan" => "nullable|in:Y,N",
+        "is_terlambat" => "nullable|in:Y,N",
+        "alasan_dikembalikan" => "nullable|string|max:255",
+        'dokumen_upload' => 'nullable|mimes:pdf,doc,docx',
+      ]);
 
-        if ($validator->fails()) {
-          return response()->json(['errors' => $validator->errors()], 400);
-        }
-
-        $is_dikembalikan = 'N';
-        $is_terlambat = 'N';
-        $alasan_dikembalikan = null;
-
-        $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'is_terlambat', 'alasan_dikembalikan']);
-        $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
-        $dataToUpdate['is_terlambat'] = $is_terlambat;
-        $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
-
-        $surat->update($dataToUpdate);
-
-        return response()->json(['success' => true, 'message' => 'Surat berhasil diupdate', 'data' => $surat]);
-      } else {
-        return response()->json(['success' => false, 'message' => 'Tidak bisa update surat, karena is_dikembalikan masih false']);
+      if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
       }
+
+      $is_dikembalikan = 'N';
+      $is_terlambat = 'N';
+      $alasan_dikembalikan = null;
+
+      $dataToUpdate = $request->only(['kategori', 'alamat_lokasi', 'longitude', 'latitude', 'is_dikembalikan', 'is_terlambat', 'alasan_dikembalikan']);
+      $dataToUpdate['is_dikembalikan'] = $is_dikembalikan;
+      $dataToUpdate['is_terlambat'] = $is_terlambat;
+      $dataToUpdate['alasan_dikembalikan'] = $alasan_dikembalikan;
+
+      $surat->update($dataToUpdate);
+
+      return response()->json(['success' => true, 'message' => 'Surat berhasil diupdate', 'data' => $surat]);
+      // } else {
+      //   return response()->json(['success' => false, 'message' => 'Tidak bisa update surat, karena is_dikembalikan masih false']);
+      // }
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
@@ -546,6 +546,44 @@ class SuratController extends Controller
     }
   }
 
+  public function tolakVerifikasiOperatorNew(Request $request, $suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Operator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $surat = Surat::findOrFail($suratId);
+
+      if ($surat->status !== 'Verifikasi Operator') {
+        return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
+      }
+
+      $surat->status = 'Ditolak';
+      $surat->is_dikembalikan = 'N';
+      $surat->is_terlambat = 'N';
+      $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
+      $surat->save();
+
+      // PushNotificationController::sendMessage(
+      //   $surat->user_id,
+      //   'Mohon maaf surat anda dikembalikan',
+      //   'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini'
+      // );
+
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Mohon maaf surat anda ditolak',
+        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
+        'is_seen' => 'N'
+      ]);
+
+      return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
   // role verifikator
   public function terimaVerifikasiVerifikator($suratId)
   {
@@ -611,6 +649,44 @@ class SuratController extends Controller
       Notifikasi::create([
         'user_id' => $surat->user_id,
         'judul' => 'Mohon maaf surat anda dikembalikan',
+        'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
+        'is_seen' => 'N'
+      ]);
+
+      return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda dikembalikan']);
+    } catch (\Exception $e) {
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+  }
+
+  public function tolakVerifikasiVerifikatorNew(Request $request, $suratId)
+  {
+    try {
+      if (auth()->user()->role->nama !== 'Verifikator') {
+        return response()->json(['message' => 'Akses ditolak'], 403);
+      }
+
+      $surat = Surat::findOrFail($suratId);
+
+      if ($surat->status !== 'Verifikasi Verifikator') {
+        return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
+      }
+
+      $surat->status = 'Ditolak';
+      $surat->is_dikembalikan = 'N';
+      $surat->is_terlambat = 'N';
+      $surat->alasan_dikembalikan = $request->alasan_dikembalikan;
+      $surat->save();
+
+      // PushNotificationController::sendMessage(
+      //   $surat->user_id,
+      //   'Mohon maaf surat anda dikembalikan',
+      //   'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini'
+      // );
+
+      Notifikasi::create([
+        'user_id' => $surat->user_id,
+        'judul' => 'Mohon maaf surat anda ditolak',
         'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' belum dapat diterima pada tahap ini. Harap lakukan pembaruan sesuai dengan yang kami tuliskan alasan dikembalikan pada detail surat. Kami mengapresiasi kerjasama Anda dalam mengatasi hal ini',
         'is_seen' => 'N'
       ]);

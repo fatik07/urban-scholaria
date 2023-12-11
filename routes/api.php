@@ -76,10 +76,12 @@ Route::controller(SuratController::class)->group(function () {
     // validasi oleh operator
     Route::patch("surat/{suratId}/terima-operator", "terimaVerifikasiOperator");
     Route::patch("surat/{suratId}/tolak-operator", "tolakVerifikasiOperator");
+    Route::patch("surat/{suratId}/tolak-operator-baru", "tolakVerifikasiOperatorNew");
 
     // verifikasi oleh verifikator
     Route::patch("surat/{suratId}/terima-verifikator", "terimaVerifikasiVerifikator");
     Route::patch("surat/{suratId}/tolak-verifikator", "tolakVerifikasiVerifikator");
+    Route::patch("surat/{suratId}/tolak-verifikator-baru", "tolakVerifikasiVerifikatorNew");
 
     Route::post("surat/{suratId}/set-jadwal-survey", "setJadwalSurvey");
 
