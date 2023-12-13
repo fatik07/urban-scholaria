@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Otong;
 use App\Models\Surat;
 use App\Models\SuratDokumen;
 use Barryvdh\DomPDF\Facade\Pdf;
