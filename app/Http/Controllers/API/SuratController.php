@@ -775,7 +775,7 @@ class SuratController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
-                "jadwal_survey" => "required|date",
+//                "jadwal_survey" => "nullable|date",
                 "alamat_survey" => "nullable|string|max:255",
                 "foto_survey" => "nullable|mimes:jpeg,png,jpg,gif,svg",
                 "longitude" => "nullable|numeric",
@@ -817,7 +817,7 @@ class SuratController extends Controller
             $dataToUpdate['status'] = "Sudah Disurvey";
             $dataToUpdate['foto_survey'] = $pathFoto;
             $dataToUpdate['dokumen_survey'] = $path;
-            $dataToUpdate['jadwal_survey'] = Carbon::parse($request->jadwal_survey)->toDateTimeString();
+//            $dataToUpdate['jadwal_survey'] = Carbon::parse($request->jadwal_survey)->toDateTimeString();
 
             $survey->update($dataToUpdate);
 
