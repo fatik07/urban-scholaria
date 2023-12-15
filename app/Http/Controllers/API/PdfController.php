@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Surat;
 use App\Models\SuratDokumen;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PdfController extends Controller
@@ -17,16 +17,21 @@ class PdfController extends Controller
             $user = auth()->user();
             $id_surat = $request->query('id_surat');
 
-            $surat = Surat::where('id', $id_surat)
-                ->where('user_id', $user->id)
-                ->with('suratJenis', 'user', 'suratDokumen.suratSyarat')
-                ->first();
+            if ($id_surat) {
+                $query = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat')
+                    ->where('id', $id_surat)
+                    ->where('user_id', $user->id);
 
-            if (!$surat) {
-                return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan atau Anda tidak memiliki hak akses'], 404);
+                $surat = $query->first();
+
+                if (!$surat) {
+                    return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan atau Anda tidak memiliki hak akses'], 404);
+                }
+
+                return response()->json(['success' => true, 'message' => 'Surat berhasil di tracking dengan id surat ' . $id_surat, 'data' => $surat]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Id surat tidak ditemukan'], 404);
             }
-
-            return response()->json(['success' => true, 'message' => 'Surat berhasil di tracking dengan id surat ' . $id_surat, 'data' => $surat]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
