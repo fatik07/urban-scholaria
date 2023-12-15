@@ -710,7 +710,7 @@ class SuratController extends Controller
                 "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
                 "jadwal_survey" => "nullable|date",
                 "tenggat_survey" => "nullable|date",
-                "dokumen_survey" => "nullable|file|mimes:pdf,doc,docx",
+                "dokumen_surat_tugas" => "nullable|file|mimes:pdf,doc,docx",
             ]);
 
             if ($validator->fails()) {
@@ -723,7 +723,7 @@ class SuratController extends Controller
                 return response()->json(['message' => 'Surat tidak dapat dijadwalkan untuk survey saat ini'], 400);
             }
 
-            $dokumenPath = $request->file('dokumen_survey')->storeAs("uploads/documents/survey/dokumen-survey", $request->file('dokumen_survey')->getClientOriginalName());
+            $dokumenPath = $request->file('dokumen_surat_tugas')->storeAs("uploads/documents/survey/dokumen-surat-tugas", $request->file('dokumen_surat_tugas')->getClientOriginalName());
 
             // Pastikan user yang membuat jadwal adalah verifikator
             if (auth()->user()->role->nama === 'Verifikator') {
@@ -737,7 +737,7 @@ class SuratController extends Controller
                     'status' => 'Belum Disurvey',
                     'jadwal_survey' => $request->jadwal_survey,
                     'tenggat_survey' => $request->tenggat_survey,
-                    "dokumen_survey" => $dokumenPath ?? null,
+                    "dokumen_surat_tugas" => $dokumenPath ?? null,
                 ]);
 
                 // buat pemohon
