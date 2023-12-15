@@ -6,103 +6,126 @@ use App\Http\Controllers\Controller;
 use App\Models\Surat;
 use App\Models\SuratDokumen;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PdfController extends Controller
 {
-  public function cetakKwitansi($surat_id)
-  {
-    $surat = SuratDokumen::where('surat_id', $surat_id)->first();
+    public function trackingSurat(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            $id_surat = $request->query('id_surat');
 
-    if (!$surat) {
-      return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan']);
+            $surat = Surat::where('id', $id_surat)
+                ->where('user_id', $user->id)
+                ->with('suratJenis', 'user', 'suratDokumen.suratSyarat')
+                ->first();
+
+            if (!$surat) {
+                return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan atau Anda tidak memiliki hak akses'], 404);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Surat berhasil di tracking dengan id surat ' . $id_surat, 'data' => $surat]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
-    $nomor_surat = $surat->surat->id;
+    public function cetakKwitansi($surat_id)
+    {
+        $surat = SuratDokumen::where('surat_id', $surat_id)->first();
 
-    $url = url("/api/surat?id_surat={$nomor_surat}");
+        if (!$surat) {
+            return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan']);
+        }
 
-    $qrcode = base64_encode(QrCode::format('svg')->size(400)->errorCorrection('H')->generate($url));
+        $nomor_surat = $surat->surat->id;
 
-    $data = [
-      'surat' => $surat,
-      'qrcode' => $qrcode
-    ];
+        $url = url("/api/tracking-surat?id_surat={$nomor_surat}");
+//        $url = url("/api/surat?id_surat={$nomor_surat}");
 
-    return Pdf::loadView('pdf.index', $data)->stream();
-  }
+        $qrcode = base64_encode(QrCode::format('svg')->size(400)->errorCorrection('H')->generate($url));
 
-  public function cetakSurat($surat_id)
-  {
-    try {
-      $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+        $data = [
+            'surat' => $surat,
+            'qrcode' => $qrcode
+        ];
 
-      if ($surat->status !== 'Selesai') {
-        return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
-      }
-
-      // Get the SuratDokumen for the specified Surat
-      $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
-
-      // Initialize empty arrays for suratSyarat and suratJenis
-      $suratSyarat = [];
-      $suratJenis = [];
-
-      // Loop through each SuratDokumen and retrieve suratSyarat and suratJenis
-      foreach ($suratDokumen as $dokumen) {
-        $suratSyarat[] = $dokumen->suratSyarat;
-        $suratJenis[] = $dokumen->suratSyarat->suratJenis;
-      }
-
-      $data = [
-        'surat' => $surat,
-        'suratDokumen' => $suratDokumen,
-        'suratSyarat' => $suratSyarat,
-        'suratJenis' => $suratJenis,
-      ];
-
-      $pdf = PDF::loadView('pdf.cetak-surat', $data);
-
-      return $pdf->stream("surat_{$surat->id}.pdf");
-    } catch (\Exception $e) {
-      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        return Pdf::loadView('pdf.index', $data)->stream();
     }
-  }
 
-  public function cetakLegalitas($surat_id)
-  {
-    try {
-      $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+    public function cetakSurat($surat_id)
+    {
+        try {
+            $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
 
-      if ($surat->status !== 'Selesai') {
-        return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
-      }
+            if ($surat->status !== 'Selesai') {
+                return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+            }
 
-      // Get the SuratDokumen for the specified Surat
-      $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
+            // Get the SuratDokumen for the specified Surat
+            $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
 
-      // Initialize empty arrays for suratSyarat and suratJenis
-      $suratSyarat = [];
-      $suratJenis = [];
+            // Initialize empty arrays for suratSyarat and suratJenis
+            $suratSyarat = [];
+            $suratJenis = [];
 
-      // Loop through each SuratDokumen and retrieve suratSyarat and suratJenis
-      foreach ($suratDokumen as $dokumen) {
-        $suratSyarat[] = $dokumen->suratSyarat;
-        $suratJenis[] = $dokumen->suratSyarat->suratJenis;
-      }
+            // Loop through each SuratDokumen and retrieve suratSyarat and suratJenis
+            foreach ($suratDokumen as $dokumen) {
+                $suratSyarat[] = $dokumen->suratSyarat;
+                $suratJenis[] = $dokumen->suratSyarat->suratJenis;
+            }
 
-      $data = [
-        'surat' => $surat,
-        'suratDokumen' => $suratDokumen,
-        'suratSyarat' => $suratSyarat,
-        'suratJenis' => $suratJenis,
-      ];
+            $data = [
+                'surat' => $surat,
+                'suratDokumen' => $suratDokumen,
+                'suratSyarat' => $suratSyarat,
+                'suratJenis' => $suratJenis,
+            ];
 
-      $pdf = PDF::loadView('pdf.cetak-legalitas', $data);
+            $pdf = PDF::loadView('pdf.cetak-surat', $data);
 
-      return $pdf->stream("surat_legalitas_{$surat->id}.pdf");
-    } catch (\Exception $e) {
-      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return $pdf->stream("surat_{$surat->id}.pdf");
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
-  }
+
+    public function cetakLegalitas($surat_id)
+    {
+        try {
+            $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+
+            if ($surat->status !== 'Selesai') {
+                return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+            }
+
+            // Get the SuratDokumen for the specified Surat
+            $suratDokumen = SuratDokumen::where('surat_id', $surat_id)->get();
+
+            // Initialize empty arrays for suratSyarat and suratJenis
+            $suratSyarat = [];
+            $suratJenis = [];
+
+            // Loop through each SuratDokumen and retrieve suratSyarat and suratJenis
+            foreach ($suratDokumen as $dokumen) {
+                $suratSyarat[] = $dokumen->suratSyarat;
+                $suratJenis[] = $dokumen->suratSyarat->suratJenis;
+            }
+
+            $data = [
+                'surat' => $surat,
+                'suratDokumen' => $suratDokumen,
+                'suratSyarat' => $suratSyarat,
+                'suratJenis' => $suratJenis,
+            ];
+
+            $pdf = PDF::loadView('pdf.cetak-legalitas', $data);
+
+            return $pdf->stream("surat_legalitas_{$surat->id}.pdf");
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }
