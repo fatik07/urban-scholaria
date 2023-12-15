@@ -39,15 +39,16 @@ class PdfController extends Controller
 
     public function cetakKwitansi($surat_id)
     {
-        $surat = SuratDokumen::where('surat_id', $surat_id)->first();
+        $surat = Surat::where('id', $surat_id)->first();
+//        $surat = SuratDokumen::where('surat_id', $surat_id)->first();
 
         if (!$surat) {
             return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan']);
         }
 
-        $nomor_surat = $surat->surat->id;
+//        $nomor_surat = $surat->surat->id;
 
-        $url = url("/api/tracking-surat?id_surat={$nomor_surat}");
+        $url = url("/api/tracking-surat?id_surat={$surat->id}");
 //        $url = url("/api/surat?id_surat={$nomor_surat}");
 
         $qrcode = base64_encode(QrCode::format('svg')->size(400)->errorCorrection('H')->generate($url));
