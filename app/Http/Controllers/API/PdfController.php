@@ -64,7 +64,12 @@ class PdfController extends Controller
     public function cetakSurat($surat_id)
     {
         try {
-            $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+            $surat = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat')->find($surat_id);
+//            $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+
+            if (!$surat) {
+                return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan'], 404);
+            }
 
             if ($surat->status !== 'Selesai') {
                 return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
