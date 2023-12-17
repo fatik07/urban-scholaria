@@ -745,7 +745,7 @@ class SuratController extends Controller
                     'status' => 'Belum Disurvey',
                     'jadwal_survey' => $request->jadwal_survey,
                     'tenggat_survey' => $request->tenggat_survey,
-                    "dokumen_surat_tugas" => $dokumenPath ?? null,
+                    'dokumen_surat_tugas' => $dokumenPath,
                 ]);
 
                 // buat pemohon
