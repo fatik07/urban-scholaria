@@ -568,6 +568,7 @@ class SuratController extends Controller
             $surat->status = 'Ditolak';
             $surat->is_dikembalikan = 'N';
             $surat->is_terlambat = 'N';
+            $surat->alasan_ditolak = $request->alasan_ditolak;
             $surat->save();
 
             $alasanDitolak = $request->alasan_ditolak;
@@ -682,6 +683,7 @@ class SuratController extends Controller
             $surat->status = 'Ditolak';
             $surat->is_dikembalikan = 'N';
             $surat->is_terlambat = 'N';
+            $surat->alasan_ditolak = $request->alasan_ditolak;
             $surat->save();
 
             $alasanDitolak = $request->alasan_ditolak;
@@ -897,6 +899,7 @@ class SuratController extends Controller
             }
 
             $surat->status = 'Ditolak';
+            $surat->alasan_ditolak = $request->alasan_ditolak;
             $surat->save();
 
             $alasanDitolak = $request->input('alasan_ditolak');
