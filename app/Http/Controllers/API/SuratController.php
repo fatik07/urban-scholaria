@@ -116,8 +116,9 @@ class SuratController extends Controller
             $nama = $request->query('nama');
             $kategori = $request->query('kategori');
             $order = $request->query('order_by');
+            $suratJenisId = $request->query('surat_jenis_id');
 
-            if ($suratId || $status || $nama || $kategori || $order) {
+            if ($suratId || $status || $nama || $kategori || $order || $suratJenisId) {
                 $query = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat');
                 $message = "Surat berhasil didapatkan";
 
@@ -146,6 +147,11 @@ class SuratController extends Controller
                 if ($order) {
                     $query->orderBy('created_at', $order);
                     $message .= " dengan order by " . $order;
+                }
+
+                if ($suratJenisId) {
+                    $query->where('surat_jenis_id', $suratJenisId);
+                    $message .= " dengan surat jenis id " . $suratJenisId;
                 }
 
                 $surat = $query->get();
