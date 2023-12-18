@@ -13,7 +13,7 @@ class SurveyorController extends Controller
     public function index(Request $request)
     {
         try {
-            if (auth()->user()->role->nama !== 'Surveyor') {
+            if (auth()->user()->role->nama !== 'Surveyor' && auth()->user()->role->nama !== 'Verifikator') {
                 return response()->json(['message' => 'Akses ditolak'], 403);
             }
 
