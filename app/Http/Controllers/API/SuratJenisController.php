@@ -123,40 +123,33 @@ class SuratJenisController extends Controller
                 return response()->json(['errors' => $validator->errors()], 400);
             }
 
-            if ($request->hasFile('gambar_alur_permohonan')) {
-                if ($suratJenis->gambar_alur_permohonan) {
-                    Storage::delete("uploads/documents/surat-jenis/gambar-alur-permohonan/" . basename($suratJenis->gambar_alur_permohonan));
-                }
+            if ($request->hasFile('gambar_alur_permohonan') && $suratJenis->gambar_alur_permohonan) {
+                Storage::delete($suratJenis->gambar_alur_permohonan);
+            }
 
-                $gambarAlurPermohonan = $request->file('gambar_alur_permohonan');
-                $gambarAlurPermohonanPath = $gambarAlurPermohonan->storeAs("uploads/documents/surat-jenis/gambar-alur-permohonan", $gambarAlurPermohonan->getClientOriginalName());
+            if ($request->hasFile('gambar_service_level_aggreement') && $suratJenis->gambar_service_level_aggreement) {
+                Storage::delete($suratJenis->gambar_service_level_aggreement);
+            }
+
+            // Proses upload dan update gambar jika ada
+            if ($request->hasFile('gambar_alur_permohonan')) {
+                $gambarAlurPermohonanPath = $request->file('gambar_alur_permohonan')->storeAs(
+                    "uploads/documents/surat-jenis/gambar-alur-permohonan",
+                    $request->file('gambar_alur_permohonan')->getClientOriginalName()
+                );
                 $suratJenis->gambar_alur_permohonan = $gambarAlurPermohonanPath;
             }
-            // else {
-            //     $gambarAlurPermohonanPath = $suratJenis->gambar_alur_permohonan;
-            // }
 
             if ($request->hasFile('gambar_service_level_aggreement')) {
-                if ($suratJenis->gambar_service_level_aggreement) {
-                    Storage::delete("uploads/documents/surat-jenis/gambar-service-level-aggreement/" . basename($suratJenis->gambar_service_level_aggreement));
-                }
-
-                $gambarServiceLevelAggreement = $request->file('gambar_service_level_aggreement');
-                $gambarServiceLevelAggreementPath = $gambarServiceLevelAggreement->storeAs("uploads/documents/surat-jenis/gambar-service-level-aggreement", $gambarServiceLevelAggreement->getClientOriginalName());
+                $gambarServiceLevelAggreementPath = $request->file('gambar_service_level_aggreement')->storeAs(
+                    "uploads/documents/surat-jenis/gambar-service-level-aggreement",
+                    $request->file('gambar_service_level_aggreement')->getClientOriginalName()
+                );
                 $suratJenis->gambar_service_level_aggreement = $gambarServiceLevelAggreementPath;
             }
-            // else {
-            //     $gambarServiceLevelAggreementPath = $suratJenis->gambar_service_level_aggreement;
-            // }
 
-            $dataToUpdate = $request->only([
-                "nama", "deskripsi"
-            ]);
-
-            // $dataToUpdate['gambar_alur_permohonan'] = $gambarAlurPermohonanPath;
-            // $dataToUpdate['gambar_service_level_aggreement'] = $gambarServiceLevelAggreementPath;
-
-            $suratJenis->update($dataToUpdate);
+            // $suratJenis->update($dataToUpdate);
+            $suratJenis->update($request->only(["nama", "deskripsi"]));
 
             return response()->json(['success' => true, 'message' => 'Surat jenis berhasil diupdate', 'data' => $suratJenis]);
         } catch (\Exception $e) {
