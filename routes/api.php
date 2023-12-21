@@ -145,10 +145,10 @@ Route::controller(SuratSyaratController::class)->group(function () {
 Route::controller(PdfController::class)->group(function () {
     Route::middleware("auth:sanctum")->group(function () {
         Route::get('tracking-surat', 'trackingSurat');
-        Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
-        Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
-        Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
     });
+    Route::get('surat/{surat_id}/cetak-kwitansi', 'cetakKwitansi');
+    Route::get('surat/{surat_id}/cetak-surat', 'cetakSurat');
+    Route::get('surat/{surat_id}/cetak-surat-legalitas', 'cetakLegalitas');
 });
 
 Route::controller(PushNotificationController::class)->group(function () {
