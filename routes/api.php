@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ChatController;
+use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\FeedbackController;
 use App\Http\Controllers\API\PdfController;
 use App\Http\Controllers\API\PushNotificationController;
@@ -156,3 +157,5 @@ Route::controller(PushNotificationController::class)->group(function () {
         Route::get('notifikasi/{id}/mark-as-seen', 'markAsSeen');
     });
 });
+
+Route::post('/hubungi-kami', [ContactController::class, 'sendContact']);
