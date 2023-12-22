@@ -23,7 +23,7 @@ class ContactController extends Controller
 
         // Kirim email
         Mail::send('emails.contact', ['request' => $request], function ($message) use ($request) {
-            $message->to('fatichur.r07@gmail.com', 'Helpdesk Urban')->subject('Pesan dari Hubungi Kami');
+            $message->to('myurbanlabs@gmail.com', 'Helpdesk Urban')->subject('Pesan dari Hubungi Kami');
             // $message->from('Helpdesk Urban Scholaria');
         });
 
