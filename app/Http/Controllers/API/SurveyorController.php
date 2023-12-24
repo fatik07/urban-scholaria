@@ -28,7 +28,7 @@ class SurveyorController extends Controller
                     return response()->json(['success' => false, 'message' => "User dengan id " . $userId . " tidak ditemukan"]);
                 }
 
-                $surveys = Survey::with('surat')->where('user_id', $userId)->get();
+                $surveys = Survey::with('surat.user', 'surat.suratJenis')->where('user_id', $userId)->get();
                 return response()->json(['success' => true, 'message' => "Survey berhasil didapatkan dengan user id " . $userId, 'data' => $surveys]);
             } elseif ($role) {
                 $expectedRole = 'Surveyor';
@@ -47,7 +47,7 @@ class SurveyorController extends Controller
                     return response()->json(['success' => false, 'message' => 'Parameter role harus bernilai Surveyor']);
                 }
             } elseif ($suratId) {
-                $surveys = Survey::with('surat')->where('surat_id', $suratId)->get();
+                $surveys = Survey::with('surat.user', 'surat.suratJenis')->where('surat_id', $suratId)->get();
 
                 if (!$surveys) {
                     return response()->json(['success' => false, 'message' => "Survey dengan surat id " . $suratId . " tidak ditemukan"], 404);
@@ -55,7 +55,7 @@ class SurveyorController extends Controller
 
                 return response()->json(['success' => true, 'message' => 'Survey berhasil didapatkan dengan surat id ' . $suratId, 'data' => $surveys]);
             } else {
-                $surveys = Survey::with('surat')->get();
+                $surveys = Survey::with('surat.user', 'surat.suratJenis')->get();
 
                 return response()->json(['success' => true, 'message' => 'Semua survey berhasil didapatkan', 'data' => $surveys]);
             }
