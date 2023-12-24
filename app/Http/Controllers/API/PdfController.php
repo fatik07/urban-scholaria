@@ -40,16 +40,16 @@ class PdfController extends Controller
     public function cetakKwitansi($surat_id)
     {
         $surat = Surat::where('id', $surat_id)->first();
-//        $surat = SuratDokumen::where('surat_id', $surat_id)->first();
+        //$surat = SuratDokumen::where('surat_id', $surat_id)->first();
 
         if (!$surat) {
             return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan']);
         }
 
-//        $nomor_surat = $surat->surat->id;
+        //$nomor_surat = $surat->surat->id;
 
         $url = url("/api/tracking-surat?id_surat={$surat->id}");
-//        $url = url("/api/surat?id_surat={$nomor_surat}");
+        //$url = url("/api/surat?id_surat={$nomor_surat}");
 
         $qrcode = base64_encode(QrCode::format('svg')->size(400)->errorCorrection('H')->generate($url));
 
@@ -65,7 +65,7 @@ class PdfController extends Controller
     {
         try {
             $surat = Surat::with('suratJenis', 'user', 'suratDokumen.suratSyarat')->find($surat_id);
-//            $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
+            //$surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
 
             if (!$surat) {
                 return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan'], 404);
@@ -108,8 +108,12 @@ class PdfController extends Controller
         try {
             $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
 
-            if ($surat->status !== 'Selesai') {
-                return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+            // if (auth()->user()->role->nama !== 'Kepala Dinas') {
+            //     return response()->json(['message' => 'Surat legalitas tidak dapat dicetak karena bukan role kepala dinas'], 400);
+            // }
+
+            if ($surat->status !== 'Selesai' && $surat->status !== 'Validasi Kepala Dinas') {
+                return response()->json(['message' => 'Surat legalitas tidak dapat dicetak karena belum memenuhi syarat'], 400);
             }
 
             // Get the SuratDokumen for the specified Surat
