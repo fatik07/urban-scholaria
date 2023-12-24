@@ -187,7 +187,7 @@ class SuratController extends Controller
                 "user_id" => "nullable|exists:user,id",
                 "surat_jenis_id" => "nullable|exists:surat_jenis,id",
                 "nama" => "nullable|string|max:255",
-                "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Selesai,Ditolak",
+                "status" => "nullable|in:Pengisian Dokumen,Verifikasi Operator,Verifikasi Verifikator,Penjadwalan Survey,Verifikasi Hasil Survey,Verifikasi Kepala Dinas,Validasi Kepala Dinas,Pengeluaran Surat,Selesai,Ditolak",
                 "is_ulasan" => "nullable|in:Y,N",
                 "kategori" => "nullable|in:TK,SD,SMP,SMA,SMK",
                 "alamat_lokasi" => "nullable|string|max:255",
@@ -783,7 +783,7 @@ class SuratController extends Controller
 
             $validator = Validator::make($request->all(), [
                 "status" => "nullable|in:Belum Disurvey,Sudah Disurvey,Survey Disetujui,Survey Ditolak",
-//                "jadwal_survey" => "nullable|date",
+                //"jadwal_survey" => "nullable|date",
                 "alamat_survey" => "nullable|string|max:255",
                 "foto_survey" => "nullable|mimes:jpeg,png,jpg,gif,svg",
                 "longitude" => "nullable|numeric",
@@ -825,7 +825,7 @@ class SuratController extends Controller
             $dataToUpdate['status'] = "Sudah Disurvey";
             $dataToUpdate['foto_survey'] = $pathFoto;
             $dataToUpdate['dokumen_survey'] = $path;
-//            $dataToUpdate['jadwal_survey'] = Carbon::parse($request->jadwal_survey)->toDateTimeString();
+            //$dataToUpdate['jadwal_survey'] = Carbon::parse($request->jadwal_survey)->toDateTimeString();
 
             $survey->update($dataToUpdate);
 
@@ -868,18 +868,18 @@ class SuratController extends Controller
                 return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
             }
 
-            $surat->status = 'Selesai';
+            $surat->status = 'Validasi Kepala Dinas';
             $surat->save();
 
             // buat pemohon
             Notifikasi::create([
                 'user_id' => $surat->user_id,
-                'judul' => 'Selamat Surat anda telah diterima dan selesai',
-                'deskripsi' => 'Kami memberitahukan bahwa surat anda untuk surat dengan nomor ' . $surat->id . ' berhasil diterima dan berstatus selesai',
+                'judul' => 'Selamat Surat anda telah memasuki tahap validasi kepala dinas',
+                'deskripsi' => 'Kami memberitahukan bahwa surat anda untuk surat dengan nomor ' . $surat->id . ' memasuki tahap validasi kepala dinas',
                 'is_seen' => 'N'
             ]);
 
-            return response()->json(['success' => true, 'message' => 'survey berhasil diselesaikan']);
+            return response()->json(['success' => true, 'message' => 'survey berhasil memasuki tahap validasi kepala dinas']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -895,6 +895,134 @@ class SuratController extends Controller
             $surat = Surat::findOrFail($suratId);
 
             if ($surat->status !== 'Verifikasi Hasil Survey') {
+                return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
+            }
+
+            $surat->status = 'Ditolak';
+            $surat->alasan_ditolak = $request->alasan_ditolak;
+            $surat->save();
+
+            $alasanDitolak = $request->input('alasan_ditolak');
+
+            // buat pemohon
+            Notifikasi::create([
+                'user_id' => $surat->user_id,
+                'judul' => 'Mohon maaf surat anda dikembalikan',
+                'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' telah ditolak dengan alasan: ' . $alasanDitolak,
+                'is_seen' => 'N'
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda ditolak']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    // kepala dinas
+    public function terimaVerifikasiHasilSurvey($suratId)
+    {
+        try {
+            if (auth()->user()->role->nama !== 'Kepala Dinas') {
+                return response()->json(['message' => 'Akses ditolak'], 403);
+            }
+
+            $surat = Surat::findOrFail($suratId);
+
+            if ($surat->status !== 'Validasi Kepala Dinas') {
+                return response()->json(['message' => 'Surat belum bisa di verifikasi / validasi karena belum memenuhi tahapan syarat'], 403);
+            }
+
+            $surat->status = 'Pengeluaran Surat';
+            $surat->save();
+
+            // buat pemohon
+            Notifikasi::create([
+                'user_id' => $surat->user_id,
+                'judul' => 'Selamat Surat anda telah divalidasi oleh pihak kepala dinas',
+                'deskripsi' => 'Kami memberitahukan bahwa surat anda untuk surat dengan nomor ' . $surat->id . ' berhasil divalidasi oleh pihak kepala dinas',
+                'is_seen' => 'N'
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'survey berhasil divalidasi oleh kepala dinas']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function tolakVerifikasiHasilSurvey(Request $request, $suratId)
+    {
+        try {
+            if (auth()->user()->role->nama !== 'Kepala Dinas') {
+                return response()->json(['message' => 'Akses ditolak'], 403);
+            }
+
+            $surat = Surat::findOrFail($suratId);
+
+            if ($surat->status !== 'Validasi Kepala Dinas') {
+                return response()->json(['message' => 'Surat belum bisa di verifikasi / validasi karena belum memenuhi tahapan syarat'], 403);
+            }
+
+            $surat->status = 'Ditolak';
+            $surat->alasan_ditolak = $request->alasan_ditolak;
+            $surat->save();
+
+            $alasanDitolak = $request->input('alasan_ditolak');
+
+            // buat pemohon
+            Notifikasi::create([
+                'user_id' => $surat->user_id,
+                'judul' => 'Mohon maaf surat anda dikembalikan',
+                'deskripsi' => 'Surat yang Anda ajukan dengan nomer ' . $surat->id . ' telah ditolak dengan alasan: ' . $alasanDitolak,
+                'is_seen' => 'N'
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Mohon maaf surat anda ditolak']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    // verifikator selesai
+    public function terimaValidasiSurveyKepalaDinas($suratId)
+    {
+        try {
+            if (auth()->user()->role->nama !== 'Verifikator') {
+                return response()->json(['message' => 'Akses ditolak'], 403);
+            }
+
+            $surat = Surat::findOrFail($suratId);
+
+            if ($surat->status !== 'Pengeluaran Surat') {
+                return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
+            }
+
+            $surat->status = 'Selesai';
+            $surat->save();
+
+            // buat pemohon
+            Notifikasi::create([
+                'user_id' => $surat->user_id,
+                'judul' => 'Selamat Surat anda telah diterima dan selesai',
+                'deskripsi' => 'Kami memberitahukan bahwa surat anda untuk surat dengan nomor ' . $surat->id . ' berhasil diterima dan selesai',
+                'is_seen' => 'N'
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'survey berhasil diselesaikan']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function tolakValidasiSurveyKepalaDinas(Request $request, $suratId)
+    {
+        try {
+            if (auth()->user()->role->nama !== 'Verifikator') {
+                return response()->json(['message' => 'Akses ditolak'], 403);
+            }
+
+            $surat = Surat::findOrFail($suratId);
+
+            if ($surat->status !== 'Pengeluaran Surat') {
                 return response()->json(['message' => 'Surat belum bisa di verifikasi karena belum memenuhi tahapan syarat'], 403);
             }
 

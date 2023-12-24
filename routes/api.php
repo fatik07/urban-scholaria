@@ -86,11 +86,20 @@ Route::controller(SuratController::class)->group(function () {
 
         Route::post("surat/{suratId}/set-jadwal-survey", "setJadwalSurvey");
 
+        // verifikasi oleh surveyor
+        Route::post("survey/{surveyId}/set-hasil-survey", "terimaHasilSurvey");
+
+        // verifikator
         Route::post("surat/{suratId}/terima-hasil-survey", "terimaVerifikasiSurvey");
         Route::post("surat/{suratId}/tolak-hasil-survey", "tolakVerifikasiSurvey");
 
-        // verifikasi oleh surveyor
-        Route::post("survey/{surveyId}/set-hasil-survey", "terimaHasilSurvey");
+        // verifikasi oleh kepala dinas
+        Route::post("surat/{suratId}/terima-kepala-dinas", "terimaVerifikasiHasilSurvey");
+        Route::post("surat/{suratId}/tolak-kepala-dinas", "tolakVerifikasiHasilSurvey");
+
+        // verifikator
+        Route::post("surat/{suratId}/terima-hasil-kepala-dinas", "terimaValidasiSurveyKepalaDinas");
+        Route::post("surat/{suratId}/tolak-hasil-kepala-dinas", "tolakValidasiSurveyKepalaDinas");
     });
 });
 
