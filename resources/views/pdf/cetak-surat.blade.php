@@ -189,7 +189,7 @@
       <p>Hormat Kami,</p>
       <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/img/logo.png'))) }}" height="100"
         width="100" alt="logo urban scholaria">
-      <p>Admin Kepala Dinas</p>
+      <p>Kepala Dinas</p>
     </div>
   </div>
 
