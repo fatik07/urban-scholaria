@@ -71,8 +71,13 @@ class PdfController extends Controller
                 return response()->json(['success' => false, 'message' => 'Surat tidak ditemukan'], 404);
             }
 
-            if ($surat->status !== 'Selesai') {
-                return response()->json(['message' => 'Surat tidak dapat dicetak karena status belum selesai'], 400);
+            if (
+                $surat->status !== 'Verifikasi Hasil Survey' &&
+                $surat->status !== 'Validasi Kepala Dinas' &&
+                $surat->status !== 'Pengeluaran Surat' &&
+                $surat->status !== 'Selesai'
+            ) {
+                return response()->json(['message' => 'Anda tidak memiliki izin untuk mencetak surat ini'], 403);
             }
 
             // Get the SuratDokumen for the specified Surat
@@ -108,12 +113,13 @@ class PdfController extends Controller
         try {
             $surat = Surat::with('suratDokumen.suratSyarat.suratJenis')->findOrFail($surat_id);
 
-            // if (auth()->user()->role->nama !== 'Kepala Dinas') {
-            //     return response()->json(['message' => 'Surat legalitas tidak dapat dicetak karena bukan role kepala dinas'], 400);
-            // }
-
-            if ($surat->status !== 'Selesai' && $surat->status !== 'Validasi Kepala Dinas') {
-                return response()->json(['message' => 'Surat legalitas tidak dapat dicetak karena belum memenuhi syarat'], 400);
+            if (
+                $surat->status !== 'Verifikasi Hasil Survey' &&
+                $surat->status !== 'Validasi Kepala Dinas' &&
+                $surat->status !== 'Pengeluaran Surat' &&
+                $surat->status !== 'Selesai'
+            ) {
+                return response()->json(['message' => 'Anda tidak memiliki izin untuk mencetak surat ini'], 403);
             }
 
             // Get the SuratDokumen for the specified Surat
